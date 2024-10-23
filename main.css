@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #EEEEEE;
+    border-bottom: 4px solid red;
+    height: 45px;
+}
+
+article{
+        text-align: center;
+        padding-top: 2em;
+        display: flex;
+        flex-direction: column;
+        align-items:center;
+        
+}
+
+#assist{
+    font-size: 2em;
+}
+
+#search{
+    background-color: #EEEEEE;
+    padding: 15px;
+    width: 30em;
+    border-radius: 15px;
+    text-align: left;
+}
+
+#thread{
+    background-color: red;
+    padding: 15px;
+    width: 30em;
+    border-radius: 15px;
+    text-align: left;
+}
