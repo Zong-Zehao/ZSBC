@@ -1,10 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="viewThread.css">
     <title>OCBC - View Thread</title>
+    <script src="viewThread.js" defer></script>
 </head>
-
 <body>
     <header class="header">
         <h1>OCBC</h1>
@@ -20,11 +23,14 @@
     </div>
     <!--Search bar end-->
 
-    <!--reply button start-->
-    <div class="reply-container">
-        <button class="reply-btn">reply +</button>
-    </div>
-    <!--reply button start-->
+    <!-- Post Section -->
+    <div id="post-container" class="post-container"></div>
+
+    <!-- Reply Section -->
+    <div id="reply-container" class="reply-container"></div>
+
+
+    <!--reply button end-->
 
     <!--reply thread filter start-->
     <div class="replies-container">
