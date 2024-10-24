@@ -1,0 +1,58 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="viewThread.css">
+    <title>OCBC - View Thread</title>
+</head>
+
+<body>
+    <header class="header">
+        <h1>OCBC</h1>
+        <p>Support forum</p>
+    </header>
+
+    <!--Search bar start-->
+    <div class="search-container">
+        <button class="search-btn">
+            <img src="/images/searchIcon.png" alt="search">
+        </button>
+        <input type="text" placeholder="search forums" class="search-input">
+    </div>
+    <!--Search bar end-->
+
+    <!--reply button start-->
+    <div class="reply-container">
+        <button class="reply-btn">reply +</button>
+    </div>
+    <!--reply button start-->
+
+    <!--reply thread filter start-->
+    <div class="replies-container">
+        <span class="replies-text">Replies</span>
+        <div class="dropdown">
+            <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
+            <ul class="dropdown-content" id="dropdownContent">
+                <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
+                <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
+                <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
+            </ul>
+        </div>
+    </div>
+    <!--reply thread filter end-->
+
+
+
+
+
+    <!--reply thread filter button start-->
+    <script>
+        // Function to update the dropdown button text
+        function updateDropdown(selection) {
+            document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
+        }
+    </script>
+    <!--reply thread filter button end-->
+
+    
+
+</body>
