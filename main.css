@@ -28,18 +28,128 @@ article{
     font-size: 2em;
 }
 
-#search{
-    background-color: #EEEEEE;
+
+/* search bar */
+.search-container {
+    display: flex;
+    align-items: center;
+    width: 600px;
     padding: 15px;
-    width: 30em;
-    border-radius: 15px;
-    text-align: left;
+    border-radius: 50px;
+    background-color: #f4f4f4;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#thread{
-    background-color: red;
-    padding: 15px;
-    width: 30em;
-    border-radius: 15px;
-    text-align: left;
+.search-input {
+    border: none;
+    background: none;
+    outline: none;
+    flex-grow: 1;
+    font-size: 16px;
+    padding-left: 10px;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.search-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+/*reply button*/
+.reply-container {
+    display: flex;
+    justify-content: center;
+    margin: 50px;
+}
+
+.reply-btn {
+    background-color: #d00000; /* Red background */
+    color: white; /* White text */
+    padding: 15px 130px; /* Padding inside the button */
+    border: none; /* Remove default borders */
+    border-radius: 50px; /* Make the button rounded */
+    font-size: 16px; /* Text size */
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.reply-btn:hover {
+    background-color: #b00000; /* Darker red on hover */
+}
+
+.reply-btn:active {
+    background-color: #a00000; /* Even darker red on click */
+}
+
+/* reply thread filter start */
+.replies-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 20px 0 20px -1050px;
+}
+
+.replies-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Dropdown button */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+}
+
+.dropdown-btn:hover {
+    background-color: #F0F0F0;
+}
+
+/* Dropdown content */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #FFFFFF;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100px;
+    z-index: 1;
+}
+
+.dropdown-content li {
+    text-align: center;
+}
+
+.dropdown-content li a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    padding: 8px 10px;
+}
+
+.dropdown-content li a:hover {
+    background-color: #F0F0F0;
+}
+
+/* Show the dropdown content on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
 }

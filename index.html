@@ -16,9 +16,36 @@
 
     <article>
         <h1 id="assist">How can we assist you?</h1>
-        <p id="search">Ask a question</p>
-        <p id="thread">New Thread</p>
+        <div class="search-container">
+            <button class="search-btn">
+                <img src="/images/searchIcon.png" alt="search">
+            </button>
+            <input type="text" placeholder="Ask a question" class="search-input">
+        </div>
+        <div class="reply-container">
+            <button class="reply-btn">New Thread +</button>
+        </div>
+
+        <div class="replies-container">
+            <span class="replies-text">Replies</span>
+            <div class="dropdown">
+                <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
+                <ul class="dropdown-content" id="dropdownContent">
+                    <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
+                    <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
+                    <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
+                </ul>
+            </div>
+        </div>
+
     </article>
+
+    <script>
+        // Function to update the dropdown button text
+        function updateDropdown(selection) {
+            document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
+        }
+    </script>
 
 
 </body>
