@@ -43,13 +43,18 @@
         input[type="submit"]:hover {
             background-color: #45a049;
         }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="login-container">
     <h2>Login</h2>
-    <form action="/login" method="POST">
+    <form id="loginForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
 
@@ -57,8 +62,33 @@
         <input type="password" id="password" name="password" required>
 
         <input type="submit" value="Login">
+        <div id="error" class="error-message"></div>
     </form>
 </div>
 
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const response = await fetch("/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        window.location.href = data.redirect; // Redirect to mainpage.html on success
+    } else {
+        const error = document.getElementById("error");
+        error.textContent = "Invalid username or password";
+    }
+});
+</script>
+
 </body>
 </html>
+
