@@ -1,4 +1,4 @@
-require('dotenv').config(); // This loads environment variables
+require('dotenv').config(); // Load environment variables
 
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
