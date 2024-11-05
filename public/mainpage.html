@@ -78,17 +78,42 @@ window.onclick = function(event) {
 function submitThread() {
     const title = document.getElementById("titleInput").value;
     const question = document.getElementById("questionInput").value;
+    const username = 'your_username'; // Retrieve the logged-in user's username
 
-    if ( title && question) {
-        alert(`Thread Created!`);
+    if (title && question) {
+        // Prepare the data to send
+        const threadData = {
+            title: title,
+            content: question,
+            username: username, // Use the actual logged-in username
+        };
 
-        document.getElementById("titleInput").value = '';
-        document.getElementById("questionInput").value = '';
-        closeModal();
+        // Send a POST request to the server
+        fetch('/threads', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(threadData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                document.getElementById("titleInput").value = '';
+                document.getElementById("questionInput").value = '';
+                closeModal();
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Failed to create thread. Please try again.');
+        });
     } else {
         alert("Please fill out all fields.");
     }
 }
+
 
     </script>
 
