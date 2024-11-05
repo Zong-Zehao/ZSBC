@@ -1,0 +1,154 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #EEEEEE;
+    border-bottom: 4px solid red;
+    height: 45px;
+}
+
+/* search bar start */
+.search-container {
+    display: flex;
+    align-items: center;
+    width: 600px;
+    padding: 20px;
+    border-radius: 50px;
+    background-color: #f4f4f4;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 100px auto;
+}
+
+.search-input {
+    border: none;
+    background: none;
+    outline: none;
+    flex-grow: 1;
+    font-size: 16px;
+    padding-left: 10px;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.search-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+/* post styling */
+.post-container, .reply-container {
+    width: 50%;
+    margin: auto;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.reply {
+    margin-left: 20px;
+    padding-left: 10px;
+    border-left: 2px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.nested-reply {
+    margin-left: 40px;
+    padding-left: 10px;
+    border-left: 2px dashed #ccc;
+}
+
+.interaction {
+    margin-top: 10px;
+}
+
+.interaction span, .interaction i {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.reply-btn {
+    background-color: #d00000; 
+    color: white; 
+    padding: 5px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.reply-btn:hover {
+    background-color: #b00000;
+}
+
+.reply-btn:active {
+    background-color: #a00000;
+}
+
+/* Dropdown styling */
+.replies-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 20px 0 20px 350px;
+}
+
+.replies-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #FFFFFF;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100px;
+    z-index: 1;
+}
+
+.dropdown-content li {
+    text-align: center;
+}
+
+.dropdown-content li a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    padding: 8px 10px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
