@@ -8,12 +8,8 @@ CREATE TABLE Users (
     reputation INT DEFAULT 0
 );
 
-
-INSERT INTO Users (username, password, role, reputation) VALUES 
-('john_doe', 'password123', 'admin', 100),
-('jane_smith', 'password456', 'user', 50),
-('adminnew', '123', 'admin', 100)
-
+INSERT INTO Users (username, password, role, reputation)
+VALUES ('johndoe', 'password123', 'admin', 100);
 
 CREATE TABLE Threads ( 
     thread_id INT PRIMARY KEY IDENTITY(1,1),  -- Unique identifier for each thread 
@@ -23,3 +19,4 @@ CREATE TABLE Threads (
     username VARCHAR(255) NOT NULL,            -- Username of the user who created the thread 
     FOREIGN KEY (username) REFERENCES Users(username)  -- Reference to the Users table 
 );
+
