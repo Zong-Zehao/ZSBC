@@ -1,4 +1,4 @@
-const threadModel = require('../models/threadModel');
+/*const threadModel = require('../models/threadModel');
 
 async function createThread(req, res) {
     const { title, content, username } = req.body;
@@ -17,4 +17,6 @@ async function createThread(req, res) {
 
 module.exports = {
     createThread,
-};
+};*/
+
+
