@@ -93,11 +93,11 @@ article{
     display: flex;
     align-items: center;
     padding: 10px;
-    margin: 20px 0 20px -1050px;
+    margin: 20px 0 20px -1250px;
 }
 
 .replies-text {
-    font-size: 18px;
+    font-size: 40px;
     font-weight: bold;
     margin-right: 10px;
 }
@@ -111,7 +111,7 @@ article{
     background-color: #FFFFFF;
     border: 1px solid #CCCCCC;
     border-radius: 4px;
-    padding: 5px 10px;
+    padding: 11px 20px;
     font-size: 16px;
     cursor: pointer;
     outline: none;
@@ -207,3 +207,47 @@ article{
     cursor: pointer;
     border-radius: 4px;
 }
+
+/* new thread showcase boxes start */
+#threadsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid layout */
+    gap: 80px; /* Space between each thread */
+    padding: 2rem; /* Space around the grid */
+    justify-items: center; /* Center each thread within the container */
+    margin-left: 75px;
+}
+
+.thread {
+    background-color: #F9F9F9;
+    width: 100%; /* Full width of grid cell */
+    max-width: 350px; /* Max width to keep threads uniform */
+    height: 170px;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0px 4px 8px rgba(213, 0, 50, 0.25);
+    transition: transform 0.2s;
+}
+
+.thread:hover {
+    transform: translateY(-5px); /* Hover effect */
+}
+
+.thread h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0 0 0.5rem;
+}
+
+.thread p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 0 0.5rem;
+    line-height: 1.4; /* Improves readability */
+}
+
+.thread small {
+    font-size: 0.8rem;
+    color: #999;
+}
+/* new thread showcase boxes end */
