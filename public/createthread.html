@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Thread</title>
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -55,24 +55,24 @@
             color: #333;
             margin-bottom: 8px;
             width: 50%;
-    padding: 12px;
-    margin-left: auto;
-    margin-right: auto;
+            padding: 12px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .input-field,
-.textarea-field {
-    width: 50%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    background-color: #f9f9f9;
-    font-size: 14px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
+        .textarea-field {
+            width: 50%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
 
         .textarea-field {
@@ -100,6 +100,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <header class="header">
@@ -122,15 +123,49 @@
     <script>
         function submitThread() {
             const title = document.getElementById("titleInput").value;
-            const enquiry = document.getElementById("questionInput").value;
+            const question = document.getElementById("questionInput").value;
+            const username = localStorage.getItem("username");
 
-            if (title && enquiry) {
-                alert("Thread submitted successfully!");
+            if (!username) {
+                alert("Please log in to create a thread.");
+                window.location.href = "/login.html";
+                return;
+            }
+
+            if (title && question) {
+                const threadData = {
+                    title: title,
+                    content: question,
+                    username: username,
+                };
+
+                fetch('/threads', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(threadData),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        document.getElementById("titleInput").value = '';
+                        document.getElementById("questionInput").value = '';
+                        // Redirect to mainpage.html
+                        window.location.href = "/mainpage.html";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to create thread. Please try again.');
+                });
             } else {
-                alert("Please fill in both the title and enquiry.");
+                alert("Please fill out all fields.");
             }
         }
     </script>
 
 </body>
+
 </html>
