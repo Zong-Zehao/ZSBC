@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Thread</title>
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background-color: #EEEEEE;
+            border-bottom: 4px solid red;
+            height: 60px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: red;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .container {
+            width: 100%;
+            padding: 20px 40px;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            width: 50%;
+    padding: 12px;
+    margin-left: auto;
+    margin-right: auto;
+        }
+
+        .input-field,
+.textarea-field {
+    width: 50%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+        .textarea-field {
+            height: 120px;
+            resize: none;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 50%;
+            padding: 12px;
+            background-color: #d32f2f;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .submit-btn:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>OCBC</h1>
+        <p>Support Forum</p>
+    </header>
+
+    <div class="container">
+        <h2>New Thread</h2>
+
+        <label for="titleInput">Title</label>
+        <input type="text" id="titleInput" class="input-field" placeholder="Input your title here">
+
+        <label for="questionInput">Enquiry</label>
+        <textarea id="questionInput" class="textarea-field" placeholder="Input your enquiry here"></textarea>
+
+        <button class="submit-btn" onclick="submitThread()">Submit</button>
+    </div>
+
+    <script>
+        function submitThread() {
+            const title = document.getElementById("titleInput").value;
+            const enquiry = document.getElementById("questionInput").value;
+
+            if (title && enquiry) {
+                alert("Thread submitted successfully!");
+            } else {
+                alert("Please fill in both the title and enquiry.");
+            }
+        }
+    </script>
+
+</body>
+</html>
