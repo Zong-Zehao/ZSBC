@@ -133,34 +133,42 @@
 
         // Display all threads start
         function loadThreads() {
-            fetch('/threads', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                const threadsContainer = document.getElementById("threadsContainer");
-                threadsContainer.innerHTML = ''; // prevent duplication already loaded threads when webpage reloads
+    fetch('/threads', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const threadsContainer = document.getElementById("threadsContainer");
+        threadsContainer.innerHTML = ''; // prevent duplication already loaded threads when webpage reloads
 
-                data.forEach(thread => {
-                    const threadElement = document.createElement("div");
-                    threadElement.className = "thread";
+        data.forEach(thread => {
+            const threadElement = document.createElement("div");
+            threadElement.className = "thread";
 
-                    threadElement.innerHTML = `
-                        <h3>${thread.title}</h3>
-                        <p>${thread.content}</p>
-                        <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
-                    `;
+            // Make the whole box clickable by setting an onclick event
+            threadElement.onclick = () => {
+                window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+            };
 
-                    threadsContainer.appendChild(threadElement);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching threads:', error);
-            });
-        }
+            // Inner HTML for the thread box
+            threadElement.innerHTML = `
+                <h3>${thread.title}</h3>
+                <p>${thread.content}</p>
+                <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
+            `;
+
+            threadsContainer.appendChild(threadElement);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching threads:', error);
+    });
+}
+
+
 
         // Load threads when the page loads
         window.onload = loadThreads;
