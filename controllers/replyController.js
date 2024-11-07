@@ -1,32 +1,42 @@
-const ReplyModel = require("../models/replyModel");
+const sql = require('mssql');
+const dbConfig = require('../dbConfig');
 
-async function createReply(req, res) {
-    const { thread_id, author, content } = req.body;
+// Get replies by thread_id
+async function getRepliesByThreadId(req, res) {
+    const thread_id = req.params.thread_id;
+    try {
+        const pool = await sql.connect(dbConfig);
+        const result = await pool.request()
+            .input('thread_id', sql.Int, thread_id)
+            .query("SELECT * FROM Replies WHERE thread_id = @thread_id ORDER BY date ASC");
 
-    if (!thread_id || !author || !content) {
-        return res.status(400).send({ message: "All fields are required." });
-    }
-
-    const result = await ReplyModel.createReply(thread_id, author, content);
-    if (result.success) {
-        res.status(201).send(result);
-    } else {
-        res.status(500).send(result);
+        res.json(result.recordset);
+    } catch (error) {
+        console.error("Error fetching replies:", error);
+        res.status(500).json({ message: "Error retrieving replies" });
     }
 }
 
-async function getReplies(req, res) {
-    const { thread_id } = req.params;
+// Add a reply to a thread
+async function addReply(req, res) {
+    const { author, content } = req.body;
+    const thread_id = req.params.thread_id;
+    try {
+        const pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('thread_id', sql.Int, thread_id)
+            .input('author', sql.VarChar, author)
+            .input('content', sql.Text, content)
+            .query("INSERT INTO Replies (thread_id, author, content) VALUES (@thread_id, @author, @content)");
 
-    const replies = await ReplyModel.getRepliesByThreadId(thread_id);
-    if (replies) {
-        res.status(200).send(replies);
-    } else {
-        res.status(500).send({ message: "Error retrieving replies." });
+        res.status(201).json({ message: "Reply added successfully!" });
+    } catch (error) {
+        console.error("Error adding reply:", error);
+        res.status(500).json({ message: "Error adding reply" });
     }
 }
 
 module.exports = {
-    createReply,
-    getReplies
+    getRepliesByThreadId,
+    addReply
 };

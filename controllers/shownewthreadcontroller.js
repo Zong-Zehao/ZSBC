@@ -4,8 +4,7 @@ async function getThreads(req, res) {
     try {
         const threads = await shownewthreadmodel.getAllThreads();
         res.status(200).json(threads);
-    } 
-    catch (error) {
+    } catch (error) {
         res.status(500).json({ message: "Error retrieving threads" });
     }
 }
@@ -19,8 +18,7 @@ async function getThreadById(req, res) {
         } else {
             res.status(404).json({ message: "Thread not found" });
         }
-    } 
-    catch (error) {
+    } catch (error) {
         res.status(500).json({ message: "Error retrieving thread" });
     }
 }
