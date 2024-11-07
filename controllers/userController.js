@@ -9,7 +9,6 @@ async function login(req, res) {
     console.log("Login attempt with username:", username);
 
     const user = await User.retrieveUser(username);
-nod
     if (!user) {
       console.log("User not found for username:", username);
       return res.status(401).send("Invalid username or password");
