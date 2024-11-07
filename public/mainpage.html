@@ -24,22 +24,13 @@
             <input type="text" placeholder="Ask a question" class="search-input">
         </div>
         <div class="reply-container">
-            <button class="reply-btn">New Thread +</button>
+            <a href="createthread.html" class="reply-btn">New Thread +</a>
         </div>
-<!-- Modal Structure -->
-<div id="newThreadModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2>Start a New Thread</h2>
-        <input type="text" placeholder="Title" class="modal-input" id="titleInput">
-        <textarea placeholder="Type your question here..." class="modal-input" id="questionInput"></textarea>
-        <button class="submit-btn" onclick="submitThread()">Submit</button>
-    </div>
-</div>
+        
 
 
         <div class="replies-container">
-            <span class="replies-text">Replies</span>
+            <span class="replies-text">Threads</span>
             <div class="dropdown">
                 <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
                 <ul class="dropdown-content" id="dropdownContent">
@@ -52,76 +43,127 @@
 
     </article>
 
+    <!--show all threads start-->
+    <section id="threadsSection">
+        <div id="threadsContainer" class="threads-container">
+            <!-- Threads will be dynamically added here -->
+        </div>
+    </section>
+    <!--show all threads end-->
+
     <script>
         // Function to update the dropdown button text
         function updateDropdown(selection) {
             document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
         }
 
-const modal = document.getElementById("newThreadModal");
+        const modal = document.getElementById("newThreadModal");
 
-document.querySelector(".reply-btn").onclick = function() {
-    modal.style.display = "block";
-}
+        document.querySelector(".reply-btn").onclick = function() {
+            modal.style.display = "block";
+        }
 
-function closeModal() {
-    modal.style.display = "none";
-}
+        function closeModal() {
+            modal.style.display = "none";
+        }
 
 
-window.onclick = function(event) {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-}
-
-function submitThread() {
-    const title = document.getElementById("titleInput").value;
-    const question = document.getElementById("questionInput").value;
-    const username = localStorage.getItem("username"); // Retrieve the logged-in user's username
-
-    // Check if username exists in local storage
-    if (!username) {
-        alert("Please log in to create a thread.");
-        window.location.href = "/login.html"; // Redirect to login if username is missing
-        return;
-    }
-
-    if (title && question) {
-        // Prepare the data to send
-        const threadData = {
-            title: title,
-            content: question,
-            username: username, // Use the stored username
-        };
-
-        // Send a POST request to the server
-        fetch('/threads', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(threadData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-                document.getElementById("titleInput").value = '';
-                document.getElementById("questionInput").value = '';
-                closeModal();
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
             }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Failed to create thread. Please try again.');
+        }
+
+        // submit newly done thread to database start
+        function submitThread() {
+            const title = document.getElementById("titleInput").value;
+            const question = document.getElementById("questionInput").value;
+            const username = localStorage.getItem("username"); // Retrieve the logged-in user's username
+        
+            // Check if username exists in local storage
+            if (!username) {
+                alert("Please log in to create a thread.");
+                window.location.href = "/login.html"; // Redirect to login if username is missing
+                return;
+            }
+        
+            if (title && question) {
+                // Prepare the data to send
+                const threadData = {
+                    title: title,
+                    content: question,
+                    username: username, // Use the stored username
+                };
+            
+                // Send a POST request to the server
+                fetch('/threads', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(threadData),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        document.getElementById("titleInput").value = '';
+                        document.getElementById("questionInput").value = '';
+                        closeModal();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Failed to create thread. Please try again.');
+                });
+            } else {
+                alert("Please fill out all fields.");
+            }
+        }
+        // submit newly done thread to database end
+
+        // Display all threads start
+        function loadThreads() {
+    fetch('/threads', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const threadsContainer = document.getElementById("threadsContainer");
+        threadsContainer.innerHTML = ''; // prevent duplication already loaded threads when webpage reloads
+
+        data.forEach(thread => {
+            const threadElement = document.createElement("div");
+            threadElement.className = "thread";
+
+            // Make the whole box clickable by setting an onclick event
+            threadElement.onclick = () => {
+                window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+            };
+
+            // Inner HTML for the thread box
+            threadElement.innerHTML = `
+                <h3>${thread.title}</h3>
+                <p>${thread.content}</p>
+                <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
+            `;
+
+            threadsContainer.appendChild(threadElement);
         });
-    } else {
-        alert("Please fill out all fields.");
-    }
+    })
+    .catch(error => {
+        console.error('Error fetching threads:', error);
+    });
 }
 
 
+
+        // Load threads when the page loads
+        window.onload = loadThreads;
+        // Display all threads end
 
     </script>
 

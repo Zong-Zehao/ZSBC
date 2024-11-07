@@ -59,21 +59,31 @@ body {
 }
 
 .reply {
-    margin-left: 20px;
-    padding-left: 10px;
-    border-left: 2px solid #ccc;
-    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    position: relative;
+    border-left: 4px solid #d00000;
 }
 
 .nested-reply {
-    margin-left: 40px;
-    padding-left: 10px;
+    margin-left: 20px;
     border-left: 2px dashed #ccc;
+    padding-left: 15px;
 }
 
 .interaction {
+    display: flex;
+    align-items: center;
     margin-top: 10px;
 }
+
+.interaction span, .interaction i {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
 
 .interaction span, .interaction i {
     margin-right: 10px;
