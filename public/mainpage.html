@@ -74,54 +74,6 @@
             }
         }
 
-        // submit newly done thread to database start
-        function submitThread() {
-            const title = document.getElementById("titleInput").value;
-            const question = document.getElementById("questionInput").value;
-            const username = localStorage.getItem("username"); // Retrieve the logged-in user's username
-        
-            // Check if username exists in local storage
-            if (!username) {
-                alert("Please log in to create a thread.");
-                window.location.href = "/login.html"; // Redirect to login if username is missing
-                return;
-            }
-        
-            if (title && question) {
-                // Prepare the data to send
-                const threadData = {
-                    title: title,
-                    content: question,
-                    username: username, // Use the stored username
-                };
-            
-                // Send a POST request to the server
-                fetch('/threads', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(threadData),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        document.getElementById("titleInput").value = '';
-                        document.getElementById("questionInput").value = '';
-                        closeModal();
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    alert('Failed to create thread. Please try again.');
-                });
-            } else {
-                alert("Please fill out all fields.");
-            }
-        }
-        // submit newly done thread to database end
-
         // Display all threads start
         function loadThreads() {
     fetch('/threads', {
