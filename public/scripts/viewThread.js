@@ -1,10 +1,16 @@
-// Hardcoded post
+// Function to get the thread ID from the URL parameters
+function getThreadIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("thread_id");
+}
+
+// Global variable to store post data
 let post = {
-    author: "Jack",
-    title: "What the sigma",
-    content: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the.",
-    date: "24/10/2024",
-    likes: 0,  // Starting likes set to 0
+    author: "",
+    title: "",
+    content: "",
+    date: "",
+    likes: 0,
     dislikes: 0,
     repliesCount: 0,
     replies: []
@@ -13,6 +19,49 @@ let post = {
 // To track like/dislike state for the post
 let hasLikedPost = false;
 let hasDislikedPost = false;
+
+// Function to load thread details based on thread_id
+function loadThreadDetails() {
+    const thread_id = getThreadIdFromURL();
+
+    if (!thread_id) {
+        document.getElementById("post-container").innerHTML = "<p>Thread not found.</p>";
+        return;
+    }
+
+    // Fetch the thread details from the server using thread_id
+    fetch(`/threads/${thread_id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(thread => {
+        if (!thread) {
+            document.getElementById("post-container").innerHTML = "<p>Thread not found.</p>";
+            return;
+        }
+
+        // Update the post object with the fetched data
+        post.author = thread.username;
+        post.title = thread.title;
+        post.content = thread.content;
+        post.date = new Date(thread.date).toLocaleDateString();
+        post.likes = thread.likes || 0; // Assuming likes are stored in the database
+        post.dislikes = thread.dislikes || 0;
+        post.repliesCount = thread.repliesCount || 0;
+        post.replies = thread.replies || [];
+
+        // Render the post and replies using the updated post object
+        renderPost();
+        renderAllReplies();
+    })
+    .catch(error => {
+        console.error('Error fetching thread details:', error);
+        document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
+    });
+}
 
 // Function to render the post
 function renderPost() {
@@ -35,6 +84,8 @@ function renderPost() {
     document.getElementById("like-btn").addEventListener("click", () => handleLikeDislike("like"));
     document.getElementById("dislike-btn").addEventListener("click", () => handleLikeDislike("dislike"));
 }
+
+// The rest of the functions stay the same...
 
 // Function to handle like or dislike for the post
 function handleLikeDislike(action) {
@@ -86,73 +137,5 @@ function renderReply(reply, container, index) {
     document.getElementById(`dislike-reply-${index}`).addEventListener("click", () => handleReplyLikeDislike(index, "dislike"));
 }
 
-// Function to dynamically add replies to the post
-function addReplyToPost() {
-    const replyContent = prompt("Enter your reply:");
-    if (replyContent) {
-        post.repliesCount++;
-        const newReply = {
-            author: "You",
-            content: replyContent,
-            likes: 0,
-            dislikes: 0,
-            replies: []  // Nested replies
-        };
-        post.replies.push(newReply);
-        const replyContainer = document.getElementById("reply-container");
-        renderReply(newReply, replyContainer, post.replies.length - 1);  // Append new reply without clearing existing ones
-        document.getElementById("post-replies").innerText = post.repliesCount;
-    }
-}
-
-// Function to dynamically add replies to other replies
-function addReplyToReply(element, index) {
-    const replyContent = prompt("Enter your reply:");
-    if (replyContent) {
-        const parentDiv = element.parentElement.parentElement;
-        const replyContainer = document.createElement("div");
-        replyContainer.classList.add("reply");
-        replyContainer.innerHTML = `
-            <h4>You</h4>
-            <p>${replyContent}</p>
-            <div class="interaction">
-                <span><i class='bx bx-like'></i> <span>0</span></span>
-                <span><i class='bx bx-dislike'></i> <span>0</span></span>
-                <button class="reply-btn" onclick="addReplyToReply(this)">Reply</button>
-            </div>
-        `;
-        parentDiv.appendChild(replyContainer);  // Append reply to the parent reply without clearing others
-    }
-}
-
-// Function to handle like or dislike for each reply
-function handleReplyLikeDislike(index, action) {
-    const reply = post.replies[index];
-
-    // Ensure that the user can only like or dislike each reply once
-    if (action === "like" && !reply.hasLiked) {
-        reply.likes++;
-        reply.hasLiked = true;
-        if (reply.hasDisliked) {
-            reply.dislikes--;
-            reply.hasDisliked = false;
-        }
-    } else if (action === "dislike" && !reply.hasDisliked) {
-        reply.dislikes++;
-        reply.hasDisliked = true;
-        if (reply.hasLiked) {
-            reply.likes--;
-            reply.hasLiked = false;
-        }
-    }
-
-    // Update the like/dislike counts on the reply
-    document.getElementById(`reply-likes-${index}`).innerText = reply.likes;
-    document.getElementById(`reply-dislikes-${index}`).innerText = reply.dislikes;
-}
-
-// On page load, render the post and all replies
-window.onload = function() {
-    renderPost();
-    renderAllReplies();
-}
+// On page load, load the thread details and render them
+window.onload = loadThreadDetails;
