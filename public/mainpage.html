@@ -24,19 +24,10 @@
             <input type="text" placeholder="Ask a question" class="search-input">
         </div>
         <div class="reply-container">
-            <button class="reply-btn">New Thread +</button>
+            <a href="createthread.html" class="reply-btn">New Thread +</a>
         </div>
+        
 
-        <!-- Modal Structure -->
-        <div id="newThreadModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal()">&times;</span>
-                <h2>Start a New Thread</h2>
-                <input type="text" placeholder="Title" class="modal-input" id="titleInput">
-                <textarea placeholder="Type your question here..." class="modal-input" id="questionInput"></textarea>
-                <button class="submit-btn" onclick="submitThread()">Submit</button>
-            </div>
-        </div>
 
         <div class="replies-container">
             <span class="replies-text">Threads</span>

@@ -69,6 +69,7 @@ article{
 }
 
 .reply-btn {
+    text-decoration: none;
     background-color: #d00000; /* Red background */
     color: white; /* White text */
     padding: 15px 130px; /* Padding inside the button */
@@ -155,58 +156,6 @@ article{
 }
 
 
-.modal {
-    display: none; 
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
-}
-
-
-.modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 500px;
-}
-
-.close-btn {
-    float: right;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-
-.modal-input {
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.modal textarea.modal-input {
-    height: 100px;
-    resize: none;
-}
-.submit-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-}
 
 /* new thread showcase boxes start */
 #threadsContainer {
