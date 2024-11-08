@@ -49,7 +49,7 @@ function loadThreadDetailsAndReplies() {
 
         // Render post and replies
         renderPost();
-        renderAllReplies();
+        renderAllReplies(replies);
     })
     .catch(error => {
         console.error('Error loading thread or replies:', error);
@@ -57,7 +57,7 @@ function loadThreadDetailsAndReplies() {
     });
 }
 
-// Function to render the main post
+// Render the main post
 function renderPost() {
     const postContainer = document.getElementById("post-container");
     postContainer.innerHTML = `
@@ -100,32 +100,36 @@ function handleLikeDislike(action) {
     document.getElementById("post-dislikes").innerText = post.dislikes;
 }
 
-// Function to render all replies
-function renderAllReplies() {
-    const replyContainer = document.getElementById("reply-container");
-    replyContainer.innerHTML = ""; // Clear existing replies
-    post.replies.forEach((reply, index) => renderReply(reply, replyContainer, index));
-}
+// Function to render all replies recursively
+function renderAllReplies(replies, container = document.getElementById("reply-container"), parentId = null) {
+    container.innerHTML = ""; // Clear the container to avoid duplication
 
-// Function to render a single reply
-function renderReply(reply, container, index) {
-    const replyElement = document.createElement("div");
-    replyElement.classList.add("reply");
-    replyElement.innerHTML = `
-        <h4>${reply.author}</h4>
-        <p>${reply.content}</p>
-        <small>${new Date(reply.date).toLocaleDateString()}</small>
-        <div class="interaction">
-            <span><i class='bx bx-like' id="like-reply-${index}"></i> <span id="reply-likes-${index}">${reply.likes || 0}</span></span>
-            <span><i class='bx bx-dislike' id="dislike-reply-${index}"></i> <span id="reply-dislikes-${index}">${reply.dislikes || 0}</span></span>
-            <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id})">Reply</button>
-        </div>
-    `;
-    container.appendChild(replyElement);
+    const filteredReplies = replies.filter(reply => reply.parent_reply_id === parentId);
 
-    // Add event listeners for like/dislike on each reply
-    document.getElementById(`like-reply-${index}`).addEventListener("click", () => handleReplyLikeDislike(index, "like"));
-    document.getElementById(`dislike-reply-${index}`).addEventListener("click", () => handleReplyLikeDislike(index, "dislike"));
+    filteredReplies.forEach(reply => {
+        const replyElement = document.createElement("div");
+        replyElement.classList.add(parentId ? "nested-reply" : "reply");
+        replyElement.innerHTML = `
+            <h4>${reply.author}</h4>
+            <p>${reply.content}</p>
+            <small>${new Date(reply.date).toLocaleDateString()}</small>
+            <div class="interaction">
+                <span><i class='bx bx-like' id="like-reply-${reply.reply_id}"></i> <span id="reply-likes-${reply.reply_id}">${reply.likes || 0}</span></span>
+                <span><i class='bx bx-dislike' id="dislike-reply-${reply.reply_id}"></i> <span id="reply-dislikes-${reply.reply_id}">${reply.dislikes || 0}</span></span>
+                <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
+            </div>
+        `;
+
+        // Create a container for nested replies
+        const nestedContainer = document.createElement("div");
+        nestedContainer.classList.add("nested-reply-container");
+        replyElement.appendChild(nestedContainer);
+
+        container.appendChild(replyElement);
+
+        // Recursively render nested replies
+        renderAllReplies(replies, nestedContainer, reply.reply_id);
+    });
 }
 
 // Function to add a reply to the main post
@@ -134,38 +138,56 @@ function addReplyToPost() {
     if (!replyContent) return;
 
     const thread_id = getThreadIdFromURL();
+    if (!thread_id) {
+        console.error("Thread ID is missing");
+        return;
+    }
+
     const author = localStorage.getItem("username") || "Guest";
 
     fetch(`/threads/${thread_id}/replies`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author, content: replyContent })
+        body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id: null })
     })
     .then(response => response.json())
-    .then(() => loadThreadDetailsAndReplies())  // Refresh replies after adding
+    .then((newReply) => {
+        if (!newReply || !newReply.reply_id) {
+            console.error("Failed to get the full reply data");
+            return;
+        }
+        loadThreadDetailsAndReplies(); // Refresh replies to ensure correct styling
+    })
     .catch(error => console.error('Error adding reply:', error));
 }
 
-// Function to handle like or dislike for each reply
-function handleReplyLikeDislike(index, action) {
-    const reply = post.replies[index];
-    if (action === "like" && !reply.hasLiked) {
-        reply.likes = (reply.likes || 0) + 1;
-        reply.hasLiked = true;
-        if (reply.hasDisliked) {
-            reply.dislikes = (reply.dislikes || 0) - 1;
-            reply.hasDisliked = false;
-        }
-    } else if (action === "dislike" && !reply.hasDisliked) {
-        reply.dislikes = (reply.dislikes || 0) + 1;
-        reply.hasDisliked = true;
-        if (reply.hasLiked) {
-            reply.likes = (reply.likes || 0) - 1;
-            reply.hasLiked = false;
-        }
+// Function to add a reply to a reply
+function addReplyToReply(parent_reply_id, parentReplyElement) {
+    const replyContent = prompt("Enter your reply:");
+    if (!replyContent) return;
+
+    const thread_id = getThreadIdFromURL();
+    if (!thread_id) {
+        console.error("Thread ID is missing");
+        return;
     }
-    document.getElementById(`reply-likes-${index}`).innerText = reply.likes;
-    document.getElementById(`reply-dislikes-${index}`).innerText = reply.dislikes;
+
+    const author = localStorage.getItem("username") || "Guest";
+
+    fetch(`/threads/${thread_id}/replies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id })
+    })
+    .then(response => response.json())
+    .then((newReply) => {
+        if (!newReply || !newReply.reply_id) {
+            console.error("Failed to get the full reply data");
+            return;
+        }
+        loadThreadDetailsAndReplies(); // Refresh replies to ensure correct styling
+    })
+    .catch(error => console.error('Error adding nested reply:', error));
 }
 
 // Load the thread details and replies when the page loads
