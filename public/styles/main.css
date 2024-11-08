@@ -100,7 +100,8 @@ article{
 .replies-text {
     font-size: 40px;
     font-weight: bold;
-    margin-right: 10px;
+    margin-left: 6em;
+
 }
 
 /* Dropdown button */
@@ -176,11 +177,13 @@ article{
     padding: 1rem;
     box-shadow: 0px 4px 8px rgba(213, 0, 50, 0.25);
     transition: transform 0.2s;
+    cursor: pointer; /* Add this to show it's clickable */
 }
 
 .thread:hover {
     transform: translateY(-5px); /* Hover effect */
 }
+
 
 .thread h3 {
     font-size: 1.2rem;

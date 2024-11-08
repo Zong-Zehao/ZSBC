@@ -1,5 +1,8 @@
--- Create Database
-CREATE DATABASE FEDASG;
+--DROP TABLES   
+DROP TABLE Replies;
+DROP TABLE Threads;
+DROP TABLE Users;
+
 -- Create Users table
 CREATE TABLE Users (
     username VARCHAR(255) PRIMARY KEY,
@@ -20,3 +23,20 @@ CREATE TABLE Threads (
     FOREIGN KEY (username) REFERENCES Users(username)  -- Reference to the Users table 
 );
 
+-- Create Replies table
+CREATE TABLE Replies (
+    reply_id INT PRIMARY KEY IDENTITY(1,1),       -- Unique identifier for each reply
+    thread_id INT NOT NULL,                       -- ID of the thread this reply is associated with
+    author VARCHAR(255) NOT NULL,                 -- Username of the reply author
+    content TEXT NOT NULL,                        -- Content of the reply
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,      -- Date and time of the reply
+    FOREIGN KEY (thread_id) REFERENCES Threads(thread_id),  -- Reference to Threads table
+    FOREIGN KEY (author) REFERENCES Users(username)         -- Reference to Users table
+);
+ALTER TABLE Replies
+ADD parent_reply_id INT NULL;
+
+-- Update the foreign key constraint to reference Replies table for nested replies
+ALTER TABLE Replies
+ADD CONSTRAINT FK_Replies_ParentReply
+FOREIGN KEY (parent_reply_id) REFERENCES Replies(reply_id);

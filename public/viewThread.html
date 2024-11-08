@@ -13,41 +13,30 @@
         <h1>OCBC</h1>
         <p>Support forum</p>
     </header>
-
-    <!--Search bar start-->
-    <div class="search-container">
-        <button class="search-btn">
-            <img src="../images/searchIcon.png" alt="search">
-        </button>
-        <input type="text" placeholder="search forums" class="search-input">
-    </div>
-    <!--Search bar end-->
+<br>
 
     <!-- Post Section -->
     <div id="post-container" class="post-container"></div>
 
-    <!-- Reply Section -->
-    <div id="reply-container" class="reply-container"></div>
 
 
-    <!--reply button end-->
+<!-- Reply Section -->
+<div id="reply-container" class="reply-container"></div>
 
-    <!--reply thread filter start-->
-    <div class="replies-container">
-        <span class="replies-text">Replies</span>
-        <div class="dropdown">
-            <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
-            <ul class="dropdown-content" id="dropdownContent">
-                <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
-                <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
-                <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
-            </ul>
-        </div>
+<!-- Replies filter start -->
+<div class="replies-container">
+    <span class="replies-text">Replies</span>
+    <div class="dropdown">
+        <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
+        <ul class="dropdown-content" id="dropdownContent">
+            <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
+            <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
+            <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
+        </ul>
     </div>
+</div>
+
     <!--reply thread filter end-->
-
-
-
 
 
     <!--reply thread filter button start-->
