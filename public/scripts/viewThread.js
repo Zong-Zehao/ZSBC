@@ -60,6 +60,8 @@ function loadThreadDetailsAndReplies() {
 // Render the main post
 function renderPost() {
     const postContainer = document.getElementById("post-container");
+    const isAuthor = localStorage.getItem("username") === post.author;
+
     postContainer.innerHTML = `
         <div class="post">
             <h3>${post.author}</h3>
@@ -67,16 +69,23 @@ function renderPost() {
             <p>${post.content}</p>
             <small>${post.date}</small>
             <div class="interaction">
-                <span><i class='bx bx-like' id="like-btn"></i> <span id="post-likes">${post.likes}</span></span>
-                <span><i class='bx bx-dislike' id="dislike-btn"></i> <span id="post-dislikes">${post.dislikes}</span></span>
-                <span><i class='bx bx-chat'></i> <span id="post-replies">${post.repliesCount}</span></span>
+                <span><i class='bx bx-like'></i> ${post.likes}</span>
+                <span><i class='bx bx-dislike'></i> ${post.dislikes}</span>
+                <span><i class='bx bx-chat'></i> ${post.repliesCount}</span>
             </div>
             <button class="reply-btn" onclick="addReplyToPost()">Reply</button>
+            ${
+                isAuthor
+                    ? `<div class="menu">
+                           <button class="menu-btn" onclick="toggleMenu(this)">...</button>
+                           <div class="menu-options" style="display:none;">
+                               <button onclick="deleteThread()">Delete</button>
+                           </div>
+                       </div>`
+                    : ""
+            }
         </div>
     `;
-
-    document.getElementById("like-btn").addEventListener("click", () => handleLikeDislike("like"));
-    document.getElementById("dislike-btn").addEventListener("click", () => handleLikeDislike("dislike"));
 }
 
 // Function to handle like or dislike for the main post
@@ -107,6 +116,7 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
     const filteredReplies = replies.filter(reply => reply.parent_reply_id === parentId);
 
     filteredReplies.forEach(reply => {
+        const isAuthor = localStorage.getItem("username") === reply.author;
         const replyElement = document.createElement("div");
         replyElement.classList.add(parentId ? "nested-reply" : "reply");
         replyElement.innerHTML = `
@@ -114,10 +124,20 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             <p>${reply.content}</p>
             <small>${new Date(reply.date).toLocaleDateString()}</small>
             <div class="interaction">
-                <span><i class='bx bx-like' id="like-reply-${reply.reply_id}"></i> <span id="reply-likes-${reply.reply_id}">${reply.likes || 0}</span></span>
-                <span><i class='bx bx-dislike' id="dislike-reply-${reply.reply_id}"></i> <span id="reply-dislikes-${reply.reply_id}">${reply.dislikes || 0}</span></span>
+                <span><i class='bx bx-like'></i> ${reply.likes || 0}</span>
+                <span><i class='bx bx-dislike'></i> ${reply.dislikes || 0}</span>
                 <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
             </div>
+            ${
+                isAuthor
+                    ? `<div class="menu">
+                           <button class="menu-btn" onclick="toggleMenu(this)">...</button>
+                           <div class="menu-options" style="display:none;">
+                               <button onclick="deleteReply(${reply.reply_id})">Delete</button>
+                           </div>
+                       </div>`
+                    : ""
+            }
         `;
 
         // Create a container for nested replies
@@ -130,6 +150,43 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
         // Recursively render nested replies
         renderAllReplies(replies, nestedContainer, reply.reply_id);
     });
+}
+
+// Function to toggle the visibility of the menu
+function toggleMenu(button) {
+    const menu = button.nextElementSibling;
+    menu.style.display = menu.style.display === "none" ? "block" : "none";
+}
+
+// Function to delete a thread
+function deleteThread() {
+    const thread_id = getThreadIdFromURL();
+    const username = localStorage.getItem("username");
+    if (confirm("Are you sure you want to delete this thread?")) {
+        fetch(`/threads/${thread_id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        })
+        .then(response => response.json())
+        .then(() => window.location.href = "mainpage.html")
+        .catch(error => console.error("Error deleting thread:", error));
+    }
+}
+
+// Function to delete a reply
+function deleteReply(reply_id) {
+    const username = localStorage.getItem("username");
+    if (confirm("Are you sure you want to delete this reply?")) {
+        fetch(`/replies/${reply_id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        })
+        .then(response => response.json())
+        .then(() => loadThreadDetailsAndReplies()) // Refresh replies
+        .catch(error => console.error("Error deleting reply:", error));
+    }
 }
 
 // Function to add a reply to the main post
@@ -151,13 +208,7 @@ function addReplyToPost() {
         body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id: null })
     })
     .then(response => response.json())
-    .then((newReply) => {
-        if (!newReply || !newReply.reply_id) {
-            console.error("Failed to get the full reply data");
-            return;
-        }
-        loadThreadDetailsAndReplies(); // Refresh replies to ensure correct styling
-    })
+    .then(() => loadThreadDetailsAndReplies())
     .catch(error => console.error('Error adding reply:', error));
 }
 
@@ -180,13 +231,7 @@ function addReplyToReply(parent_reply_id, parentReplyElement) {
         body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id })
     })
     .then(response => response.json())
-    .then((newReply) => {
-        if (!newReply || !newReply.reply_id) {
-            console.error("Failed to get the full reply data");
-            return;
-        }
-        loadThreadDetailsAndReplies(); // Refresh replies to ensure correct styling
-    })
+    .then(() => loadThreadDetailsAndReplies())
     .catch(error => console.error('Error adding nested reply:', error));
 }
 
