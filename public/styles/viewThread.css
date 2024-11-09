@@ -127,3 +127,34 @@ body {
 .dropdown:hover .dropdown-content {
     display: block;
 }
+.menu {
+    position: relative;
+    display: inline-block;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.menu-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.menu-options button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    width: 100%;
+    text-align: left;
+}
