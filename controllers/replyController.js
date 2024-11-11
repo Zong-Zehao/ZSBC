@@ -143,7 +143,8 @@ async function likeReply(req, res) {
                 await pool.request()
                     .input("reply_id", sql.Int, reply_id)
                     .query(`UPDATE Replies SET ${incrementField} = ${incrementField} + 1, ${decrementField} = ${decrementField} - 1 WHERE reply_id = @reply_id`);
-
+                    await updateReputations(pool, reply_id);
+                
                 return res.status(200).json({ message: `Successfully switched to ${action} for the reply` });
             }
         } else {
@@ -169,9 +170,28 @@ async function likeReply(req, res) {
     }
 }
 
+// Update reputation for all users based on likes and dislikes
+async function updateReputations(req, res) {
+    try {
+        const pool = await sql.connect(dbConfig);
+        await pool.request().query(`
+            UPDATE Users
+            SET reputation = (
+                SELECT COALESCE(SUM(CASE WHEN reaction_type = 'like' THEN 1 WHEN reaction_type = 'dislike' THEN -1 ELSE 0 END), 0)
+                FROM ReplyReactions
+                WHERE reacted_to = Users.username
+            )
+        `);
+        
+        res.status(200).json({ message: "User reputations updated successfully" });
+    } catch (error) {
+    }
+}
+
 module.exports = {
     getRepliesByThreadId,
     addReply,
     deleteReply,
-    likeReply
+    likeReply,
+    updateReputations,
 };
