@@ -6,36 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Thread</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 20px;
             background-color: #EEEEEE;
             border-bottom: 4px solid red;
-            height: 60px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            color: red;
-        }
-
-        .header p {
-            font-size: 14px;
-            color: #555;
+            height: 45px;
         }
 
         .container {
@@ -61,7 +47,8 @@
         }
 
         .input-field,
-        .textarea-field {
+        .textarea-field,
+        .category-dropdown {
             width: 50%;
             padding: 12px;
             margin-bottom: 20px;
@@ -72,6 +59,11 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .category-dropdown{
+            padding:12px;
+            width:53em;
         }
 
 
@@ -114,6 +106,23 @@
         <label for="titleInput">Title</label>
         <input type="text" id="titleInput" class="input-field" placeholder="Input your title here">
 
+        <label for="categoryDropdown">Category</label>
+        <select id="categoryDropdown" class="category-dropdown">
+            <option value="Accounts">Accounts</option>
+            <option value="Loans">Loans</option>
+            <option value="Investments">Investments</option>
+            <option value="Cards">Cards</option>
+            <option value="Insurance">Insurance</option>
+            <option value="Digital Banking">Digital Banking</option>
+            <option value="Rewards">Rewards</option>
+            <option value="Retirement">Retirement</option>
+            <option value="Student Help">Student Help</option>
+            <option value="Career Help">Career Help</option>
+            <option value="Community">Community</option>
+            <option value="News">News</option>
+            <option value="General Support">General Support</option>
+        </select>
+
         <label for="questionInput">Enquiry</label>
         <textarea id="questionInput" class="textarea-field" placeholder="Input your enquiry here"></textarea>
 
@@ -124,6 +133,7 @@
         function submitThread() {
             const title = document.getElementById("titleInput").value;
             const question = document.getElementById("questionInput").value;
+            const category = document.getElementById("categoryDropdown").value;
             const username = localStorage.getItem("username");
 
             if (!username) {
@@ -132,10 +142,12 @@
                 return;
             }
 
-            if (title && question) {
+
+            if (title && question && category) {
                 const threadData = {
                     title: title,
                     content: question,
+                    category: category,
                     username: username,
                 };
 
@@ -152,7 +164,7 @@
                         alert(data.message);
                         document.getElementById("titleInput").value = '';
                         document.getElementById("questionInput").value = '';
-                        // Redirect to mainpage.html
+                        document.getElementById("categoryDropdown").value = 'Accounts';
                         window.location.href = "/mainpage.html";
                     }
                 })
