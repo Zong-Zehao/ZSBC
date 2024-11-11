@@ -21,13 +21,11 @@
             <button class="search-btn">
                 <i class='bx bx-search-alt-2'></i>
             </button>
-            <input type="text" placeholder="Ask a question" class="search-input">
+            <input type="text" placeholder="Ask a question" class="search-input" id="searchInput">
         </div>
         <div class="reply-container">
             <a href="createthread.html" class="reply-btn">New Thread +</a>
         </div>
-        
-
 
         <div class="replies-container">
             <span class="replies-text">Threads</span>
@@ -57,67 +55,58 @@
             document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
         }
 
-        const modal = document.getElementById("newThreadModal");
-
-        document.querySelector(".reply-btn").onclick = function() {
-            modal.style.display = "block";
-        }
-
-        function closeModal() {
-            modal.style.display = "none";
-        }
-
-
-        window.onclick = function(event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        // Display all threads start
+        // Function to load and display threads
         function loadThreads() {
-    fetch('/threads', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        const threadsContainer = document.getElementById("threadsContainer");
-        threadsContainer.innerHTML = ''; // prevent duplication already loaded threads when webpage reloads
+            fetch('/threads', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.allThreads = data; // Store all threads globally for filtering
+                displayThreads(data);
+            })
+            .catch(error => {
+                console.error('Error fetching threads:', error);
+            });
+        }
+        function displayThreads(threads) {
+            const threadsContainer = document.getElementById("threadsContainer");
+            threadsContainer.innerHTML = '';
 
-        data.forEach(thread => {
-            const threadElement = document.createElement("div");
-            threadElement.className = "thread";
+            threads.forEach(thread => {
+                const threadElement = document.createElement("div");
+                threadElement.className = "thread";
 
-            // Make the whole box clickable by setting an onclick event
-            threadElement.onclick = () => {
-                window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
-            };
+             
+                threadElement.onclick = () => {
+                    window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+                };
 
-            // Inner HTML for the thread box
-            threadElement.innerHTML = `
-                <h3>${thread.title}</h3>
-                <p>${thread.content}</p>
-                <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
-            `;
+                threadElement.innerHTML = `
+                    <h3>${thread.title}</h3>
+                    <p>${thread.content}</p>
+                    <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
+                `;
 
-            threadsContainer.appendChild(threadElement);
+                threadsContainer.appendChild(threadElement);
+            });
+        }
+
+
+        document.getElementById("searchInput").addEventListener("input", function() {
+            const query = this.value.toLowerCase();
+            const filteredThreads = window.allThreads.filter(thread =>
+                thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query)
+            );
+            displayThreads(filteredThreads);
         });
-    })
-    .catch(error => {
-        console.error('Error fetching threads:', error);
-    });
-}
-
-
 
         // Load threads when the page loads
         window.onload = loadThreads;
-        // Display all threads end
-
     </script>
 
-
 </body>
+</html>

@@ -3,9 +3,9 @@ const dbConfig = require("../dbConfig");
 
 // Create a new thread
 async function createThread(req, res) {
-    const { title, content, username } = req.body;
+    const { title, content, username, category } = req.body;
 
-    if (!title || !content || !username) {
+    if (!title || !content || !username || !category) {
         return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -16,8 +16,9 @@ async function createThread(req, res) {
             .input("title", sql.VarChar, title)
             .input("content", sql.Text, content)
             .input("username", sql.VarChar, username)
+            .input("category", sql.VarChar, category)  // New input for category
             .query(
-                "INSERT INTO Threads (title, content, username) VALUES (@title, @content, @username)"
+                "INSERT INTO Threads (title, content, username, category) VALUES (@title, @content, @username, @category)"
             );
 
         res.status(201).json({ message: "Thread created successfully!" });
