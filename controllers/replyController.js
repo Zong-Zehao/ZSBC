@@ -101,17 +101,18 @@ async function likeReply(req, res) {
     try {
         const pool = await sql.connect(dbConfig);
 
-        // Check if the reply exists
+        // Get the reply and its author
         const replyResult = await pool.request()
             .input("reply_id", sql.Int, reply_id)
-            .query("SELECT * FROM Replies WHERE reply_id = @reply_id");
+            .query("SELECT author FROM Replies WHERE reply_id = @reply_id");
 
         if (!replyResult.recordset.length) {
             return res.status(404).json({ message: "Reply not found" });
         }
 
-        // Check if the user is the author of the reply
         const replyAuthor = replyResult.recordset[0].author;
+        
+        // Check if the user is the author of the reply
         if (replyAuthor === username) {
             return res.status(403).json({ message: "You cannot like or dislike your own reply" });
         }
@@ -133,28 +134,26 @@ async function likeReply(req, res) {
                     .input("reply_id", sql.Int, reply_id)
                     .input("username", sql.VarChar, username)
                     .input("reaction_type", sql.VarChar, action)
-                    .query("UPDATE ReplyReactions SET reaction_type = @reaction_type WHERE reply_id = @reply_id AND username = @username");
+                    .input("reacted_to", sql.VarChar, replyAuthor)
+                    .query("UPDATE ReplyReactions SET reaction_type = @reaction_type, reacted_to = @reacted_to WHERE reply_id = @reply_id AND username = @username");
 
                 // Adjust like and dislike counts
                 const incrementField = action === 'like' ? 'likes' : 'dislikes';
                 const decrementField = action === 'like' ? 'dislikes' : 'likes';
                 await pool.request()
                     .input("reply_id", sql.Int, reply_id)
-                    .query(`
-                        UPDATE Replies 
-                        SET ${incrementField} = ${incrementField} + 1, ${decrementField} = ${decrementField} - 1 
-                        WHERE reply_id = @reply_id
-                    `);
+                    .query(`UPDATE Replies SET ${incrementField} = ${incrementField} + 1, ${decrementField} = ${decrementField} - 1 WHERE reply_id = @reply_id`);
 
                 return res.status(200).json({ message: `Successfully switched to ${action} for the reply` });
             }
         } else {
-            // If no reaction exists, add a new one
+            // Add a new reaction if none exists
             await pool.request()
                 .input("reply_id", sql.Int, reply_id)
                 .input("username", sql.VarChar, username)
                 .input("reaction_type", sql.VarChar, action)
-                .query("INSERT INTO ReplyReactions (reply_id, username, reaction_type) VALUES (@reply_id, @username, @reaction_type)");
+                .input("reacted_to", sql.VarChar, replyAuthor)
+                .query("INSERT INTO ReplyReactions (reply_id, username, reaction_type, reacted_to) VALUES (@reply_id, @username, @reaction_type, @reacted_to)");
 
             // Increment the like or dislike count
             const likeDislikeField = action === 'like' ? 'likes' : 'dislikes';
