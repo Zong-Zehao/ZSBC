@@ -51,8 +51,10 @@ CREATE TABLE ReplyReactions (
     reply_id INT NOT NULL,
     username VARCHAR(255) NOT NULL,
     reaction_type VARCHAR(10) CHECK (reaction_type IN ('like', 'dislike')),
+    reacted_to VARCHAR(255) NOT NULL,
     FOREIGN KEY (reply_id) REFERENCES Replies(reply_id),
-    FOREIGN KEY (username) REFERENCES Users(username)
+    FOREIGN KEY (username) REFERENCES Users(username),
+    FOREIGN KEY (reacted_to) REFERENCES Users(username)
 );
 
 -- Ensure each user can only have one reaction per reply
