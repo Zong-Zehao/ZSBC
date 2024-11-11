@@ -5,7 +5,7 @@ const port = 3000;
 const userController = require("./controllers/userController");
 const { createThread, deleteThread } = require("./controllers/threadController"); // Import corrected controller
 const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller'); 
-const { getRepliesByThreadId, addReply, deleteReply} = require("./controllers/replyController");
+const { getRepliesByThreadId, addReply, deleteReply, likeReply} = require("./controllers/replyController");
 
 const staticMiddleware = express.static("public");
 
@@ -26,6 +26,8 @@ app.delete("/threads/:thread_id", deleteThread); // Delete thread route
 app.get("/threads/:thread_id/replies", getRepliesByThreadId);
 app.post("/threads/:thread_id/replies", addReply);
 app.delete("/replies/:reply_id", deleteReply); // Delete reply route
+app.post("/replies/:reply_id/likes", likeReply);
+
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
