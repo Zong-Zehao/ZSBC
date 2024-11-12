@@ -10,24 +10,94 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    background-color: #EEEEEE;
-    border-bottom: 4px solid red;
-    height: 45px;
+    background-color: white;
+    border-left: 8px solid #e11a27;
+    height: 60px;
 }
 
-article{
-        text-align: center;
-        padding-top: 2em;
-        display: flex;
-        flex-direction: column;
-        align-items:center;
-        
+.header img{
+    width: 10em;
+}
+
+.header p{
+    margin-right: 1.5em;
+    font-weight:bold;
+    font-size: 1.2em;
+}
+
+/* Styles for the box below the header */
+.navbar {
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow at the bottom */
+    text-align: center;
+    height: 15px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.navbar p {
+    margin-right:40px;
+}
+
+.image{
+    display:flex;
+    flex-direction: row;
+    background-color: #6D89A4;
+    justify-content: space-between;
+    color:white;
+    font-weight:bold
+}
+
+.image img{
+    width:40%;
+    height: 30%;
+    padding: 0px;
+}
+
+.image p{
+    font-size: 2.5em;
+    margin-left: 1em;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.text{
+    flex-direction: column;
+}
+
+.scroll{
+    margin-left: 2em;
+    width:8em;
+    height:2.5em;
+    background-color: #e11a27;
+    color:white;
+    border-radius: 10px;
+    margin-top:60px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer; /* Changes the mouse pointer to a click hand icon */
+
+}
+
+.scroll:hover {
+    background-color: #a00000; /* Slightly darker on hover */
+    color: white;
 }
 
 #assist{
-    font-size: 2em;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 2.5em;
 }
 
+article{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    
+}
 
 /* search bar */
 .search-container {
@@ -91,22 +161,21 @@ article{
 
 /* reply thread filter start */
 .replies-container {
+    margin-top: 2em;
     display: flex;
-    align-items: center;
-    padding: 10px;
-    margin: 20px 0 20px -1250px;
+    width: 90%; /* Optional: makes the container full width */
 }
+
 
 .replies-text {
     font-size: 40px;
     font-weight: bold;
-    margin-left: 6em;
-
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
 /* Dropdown button */
 .dropdown {
-    position: relative;
+    margin-left: 20px; /* Adjust this value as needed */
 }
 
 .dropdown-btn {
