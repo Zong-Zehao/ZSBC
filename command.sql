@@ -23,8 +23,12 @@ CREATE TABLE Threads (
     content TEXT NOT NULL,                      -- Content of the thread 
     date DATE DEFAULT CURRENT_TIMESTAMP,      -- Date when the thread is created 
     username VARCHAR(255) NOT NULL,            -- Username of the user who created the thread 
+    total_likes INT DEFAULT 0,
+    total_dislikes INT DEFAULT 0,
+    likes TEXT,
+    dislikes TEXT,
     FOREIGN KEY (username) REFERENCES Users(username)  -- Reference to the Users table 
-)
+);
 
 -- Create Replies table
 CREATE TABLE Replies (
