@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: white;
+    border-left: 8px solid #e11a27;
+    height: 60px;
+}
+
+.header img{
+    width: 10em;
+}
+
+.header p{
+    margin-right: 1.5em;
+    font-weight:bold;
+    font-size: 1.2em;
+}
+
+/* Styles for the box below the header */
+.navbar {
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow at the bottom */
+    text-align: center;
+    height: 15px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.navbar p {
+    margin-right:40px;
+}
+
+.container {
+    width: 100%;
+    padding: 20px 40px;
+}
+
+h2 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    width: 50%;
+    padding: 12px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.input-field,
+.textarea-field,
+.category-dropdown {
+    width: 50%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.category-dropdown {
+    padding: 12px;
+    width: 53em;
+}
+
+
+.textarea-field {
+    height: 120px;
+    resize: none;
+}
+
+.submit-btn {
+    display: block;
+    width: 50%;
+    padding: 12px;
+    background-color: #d32f2f;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.submit-btn:hover {
+    background-color: #b71c1c;
+}
