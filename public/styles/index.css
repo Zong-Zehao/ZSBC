@@ -47,58 +47,69 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 100vh; /* Ensures the content centers vertically within the viewport */
     background-color: #eeeeee;
+    
 }
 
 .login-container {
-    margin-top:3em;
     background-color: #f9f9f9;
-    padding: 160px;
+    padding: 2em; /* Sets a balanced padding around the form */
     border-radius: 16px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 40em;
-    height: 15em;
+    width: 100%;
+    max-width: 600px; /* Limits the form width */
     text-align: center;
+    margin-top: -10em; /* Adjust this value to control how far up it moves */
+    background-color: white;
+
 }
 
 .login-container h2 {
-    margin-bottom: 40px;
-    font-size: 48px;
-    color: #333;
+    font-size: 2rem;
+    margin-bottom: 1.5em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight:bold;
+    margin-top:0.5em;
+    
 }
 
 .login-container label {
     display: block;
     text-align: left;
-    margin-bottom: 10px;
+    margin-bottom: 0.5em;
     color: #333;
     font-weight: bold;
-    font-size: 24px;
+    font-size: 1.2rem;
+    margin-left:20px;
 }
 
 .login-container input[type="text"],
 .login-container input[type="password"] {
-    width: 100%;
-    padding: 20px;
-    margin-bottom: 40px;
+    width: 90%;
+    padding: 1em;
+    margin-bottom: 1.5em;
     border: 2px solid #ccc;
     border-radius: 8px;
-    font-size: 24px;
-    background-color: #e0e0e0;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    font-family: monospace;
 }
 
 .login-container input[type="submit"] {
-    width: 25%;
-    padding: 20px;
+    width: 50%;
+    padding: 12px;
     background-color: #d32f2f;
     color: white;
     border: none;
     border-radius: 8px;
-    font-weight: bold;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
-    margin: 0 auto;
-    display: block;
+    border:2px solid #333;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight:bold;
+    margin-top: 15px;
+
 }
 
 .login-container input[type="submit"]:hover {
@@ -107,6 +118,10 @@ body {
 
 .error-message {
     color: #d32f2f;
-    font-size: 18px;
-    margin-top: 20px;
+    font-size: 1rem;
+    margin-top: 1em;
+}
+
+#loginForm {
+    margin-bottom: 0; /* Prevents excessive space at the bottom */
 }

@@ -20,9 +20,10 @@ body {
 }
 
 .header p{
-    margin-right: 1.5em;
+    margin-right: 2em;
     font-weight:bold;
     font-size: 1.2em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 /* Styles for the box below the header */
@@ -78,7 +79,6 @@ body {
     font-weight: bold;
     font-size: 20px;
     cursor: pointer; /* Changes the mouse pointer to a click hand icon */
-
 }
 
 .scroll:hover {
@@ -117,6 +117,13 @@ article{
     flex-grow: 1;
     font-size: 16px;
     padding-left: 10px;
+    font-family: monospace;
+}
+
+.search-container{
+    border: 2px solid #ccc;
+    border-radius: 8px;
+
 }
 
 .search-btn {
@@ -124,6 +131,8 @@ article{
     border: none;
     padding: 0;
     cursor: pointer;
+
+
 }
 
 .search-btn img {
@@ -139,16 +148,19 @@ article{
 }
 
 .reply-btn {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight:bold;
     text-decoration: none;
     background-color: #d00000; /* Red background */
     color: white; /* White text */
     padding: 15px 130px; /* Padding inside the button */
     border: none; /* Remove default borders */
-    border-radius: 50px; /* Make the button rounded */
-    font-size: 16px; /* Text size */
+    border-radius: 10px;
+    font-size: 20px; /* Text size */
     cursor: pointer; /* Pointer cursor on hover */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
     transition: background-color 0.3s ease; /* Smooth hover effect */
+    border:2px solid #333;
 }
 
 .reply-btn:hover {
@@ -170,7 +182,8 @@ article{
 .replies-text {
     font-size: 40px;
     font-weight: bold;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-left:20px;
 }
 
 /* Dropdown button */
