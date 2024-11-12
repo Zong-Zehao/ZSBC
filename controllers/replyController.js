@@ -107,6 +107,108 @@ async function deleteReply(req, res) {
     }
 }
 
+// Like a thread
+async function likeThread(req, res) {
+    const { thread_id } = req.params;
+    const { username } = req.body; 
+
+    try {
+        const pool = await sql.connect(dbConfig);
+
+        // Fetch current likes and dislikes as JSON arrays
+        const threadResult = await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .query("SELECT likes, dislikes FROM Threads WHERE thread_id = @thread_id");
+
+        if (!threadResult.recordset.length) {
+            return res.status(404).json({ message: "Thread not found" });
+        }
+
+        let { likes, dislikes } = threadResult.recordset[0];
+        likes = JSON.parse(likes || "[]");
+        dislikes = JSON.parse(dislikes || "[]");
+
+        // Check if the user already liked the thread
+        if (likes.includes(username)) {
+            return res.status(403).json({ message: "You have already liked this thread." });
+        }
+
+        // Remove user from dislikes if they previously disliked the thread
+        dislikes = dislikes.filter(user => user !== username);
+        likes.push(username);
+
+        // Update likes and dislikes in the Threads table
+        await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .input("likes", sql.VarChar, JSON.stringify(likes))
+            .input("dislikes", sql.VarChar, JSON.stringify(dislikes))
+            .input("total_likes", sql.Int, likes.length)
+            .input("total_dislikes", sql.Int, dislikes.length)
+            .query(`
+                UPDATE Threads 
+                SET likes = @likes, dislikes = @dislikes, 
+                    total_likes = @total_likes, total_dislikes = @total_dislikes 
+                WHERE thread_id = @thread_id
+            `);
+
+        res.status(200).json({ message: "Thread liked successfully." });
+    } catch (error) {
+        console.error("Error liking thread:", error);
+        res.status(500).json({ message: "Error liking thread" });
+    }
+}
+
+// Dislike a thread
+async function dislikeThread(req, res) {
+    const { thread_id } = req.params;
+    const { username } = req.body;
+
+    try {
+        const pool = await sql.connect(dbConfig);
+
+        // Fetch current likes and dislikes as JSON arrays
+        const threadResult = await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .query("SELECT likes, dislikes FROM Threads WHERE thread_id = @thread_id");
+
+        if (!threadResult.recordset.length) {
+            return res.status(404).json({ message: "Thread not found" });
+        }
+
+        let { likes, dislikes } = threadResult.recordset[0];
+        likes = JSON.parse(likes || "[]");
+        dislikes = JSON.parse(dislikes || "[]");
+
+        // Check if the user already disliked the thread
+        if (dislikes.includes(username)) {
+            return res.status(403).json({ message: "You have already disliked this thread." });
+        }
+
+        // Remove user from likes if they previously liked the thread
+        likes = likes.filter(user => user !== username);
+        dislikes.push(username);
+
+        // Update likes and dislikes in the Threads table
+        await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .input("likes", sql.VarChar, JSON.stringify(likes))
+            .input("dislikes", sql.VarChar, JSON.stringify(dislikes))
+            .input("total_likes", sql.Int, likes.length)
+            .input("total_dislikes", sql.Int, dislikes.length)
+            .query(`
+                UPDATE Threads 
+                SET likes = @likes, dislikes = @dislikes, 
+                    total_likes = @total_likes, total_dislikes = @total_dislikes 
+                WHERE thread_id = @thread_id
+            `);
+
+        res.status(200).json({ message: "Thread disliked successfully." });
+    } catch (error) {
+        console.error("Error disliking thread:", error);
+        res.status(500).json({ message: "Error disliking thread" });
+    }
+}
+
 // Like or dislike a reply
 async function likeReply(req, res) {
     const { reply_id } = req.params;
@@ -208,4 +310,6 @@ module.exports = {
     deleteReply,
     likeReply,
     updateReputations,
+    likeThread,
+    dislikeThread,
 };

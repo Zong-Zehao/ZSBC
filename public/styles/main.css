@@ -94,6 +94,7 @@ article{
     display: flex;
     align-items: center;
     padding: 10px;
+    padding-left: 100px;
     margin: 20px 0 20px -1250px;
 }
 
@@ -203,3 +204,35 @@ article{
     color: #999;
 }
 /* new thread showcase boxes end */
+
+/* Category filter styling */
+.category-filter {
+    appearance: none;
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    padding: 11px 40px 11px 20px; 
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hover effect */
+.category-filter:hover {
+    background-color: #F9F9F9;
+    border-color: #B3B3B3;
+}
+
+/* Focus effect */
+.category-filter:focus {
+    border-color: #d00000;
+    box-shadow: 0 0 3px rgba(208, 0, 0, 0.4);
+}
+
+/* Positioning for the category filter container */
+.dropdown {
+    margin-left: 20px;
+}
+
