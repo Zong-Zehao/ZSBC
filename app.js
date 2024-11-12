@@ -9,7 +9,6 @@ const { createThread, deleteThread } = require("./controllers/threadController")
 
 const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller');
 const isAdmin = require("./controllers/authMiddleware");
-const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller'); 
 const { getRepliesByThreadId, addReply, deleteReply, likeReply, likeThread, dislikeThread} = require("./controllers/replyController");
 
 
