@@ -71,8 +71,12 @@ function renderPost() {
             <p>${post.content}</p>
             <small>${post.date}</small>
             <div class="interaction">
-                <span><i class='bx bx-like' onclick="handleLikeDislike('like')"></i> ${post.likes}</span>
-                <span><i class='bx bx-dislike' onclick="handleLikeDislike('dislike')"></i> ${post.dislikes}</span>
+                <span>
+                    <i class='bx bx-like ${hasLikedPost ? 'active' : ''}' onclick="handleLikeDislikeThread('like')"></i>
+                </span>
+                <span>
+                    <i class='bx bx-dislike ${hasDislikedPost ? 'active' : ''}' onclick="handleLikeDislikeThread('dislike')"></i>
+                </span>
                 <span><i class='bx bx-chat'></i> ${post.repliesCount}</span>
             </div>
             <button class="reply-btn" onclick="addReplyToPost()">Reply</button>
@@ -81,21 +85,42 @@ function renderPost() {
 }
 
 // Function to handle like or dislike for the main post
-function handleLikeDislike(action) {
+function handleLikeDislikeThread(action) {
     const thread_id = getThreadIdFromURL();
+    const username = localStorage.getItem("username");
+
     if (!thread_id) {
         console.error("Thread ID is missing");
         return;
     }
 
-    fetch(`/threads/${thread_id}/likes`, {
+    // Check if the user has already liked or disliked
+    if (action === 'like' && hasLikedPost) return;  // Prevent multiple likes
+    if (action === 'dislike' && hasDislikedPost) return;  // Prevent multiple dislikes
+
+    // Toggle like/dislike status
+    if (action === 'like') {
+        hasLikedPost = true;
+        hasDislikedPost = false; // If liked, reset dislike status
+    } else if (action === 'dislike') {
+        hasDislikedPost = true;
+        hasLikedPost = false; // If disliked, reset like status
+    }
+
+    fetch(`/threads/${thread_id}/${action}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action })  // action can be 'like' or 'dislike'
+        body: JSON.stringify({ username })  // Include username in the request
     })
     .then(response => response.json())
-    .then(() => loadThreadDetailsAndReplies())  // Refresh the thread and replies after liking/disliking
-    .catch(error => console.error("Error liking/disliking thread:", error));
+    .then((data) => {
+        if (data.message === "Thread liked successfully." || data.message === "Thread disliked successfully.") {
+            loadThreadDetailsAndReplies();  // Refresh thread details after action
+        } else {
+            console.error(data.message);
+        }
+    })
+    .catch(error => console.error(`Error ${action} thread:`, error));
 }
 
 // Function to handle like or dislike for a reply
@@ -240,3 +265,4 @@ function addReplyToReply(parent_reply_id, parentReplyElement) {
 
 // Load the thread details and replies when the page loads
 window.onload = loadThreadDetailsAndReplies;
+
