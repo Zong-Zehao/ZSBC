@@ -29,20 +29,22 @@ function loadThreadDetailsAndReplies() {
         return;
     }
 
-    // Fetch thread details and replies
+    // Fetch thread details and replies along with total likes and dislikes
     Promise.all([
         fetch(`/threads/${thread_id}`).then(response => response.json()), // Get thread details
-        fetch(`/threads/${thread_id}/replies`).then(response => response.json()) // Get replies
+        fetch(`/threads/${thread_id}/replies`).then(response => response.json()) // Get replies and total likes/dislikes
     ])
-    .then(([thread, replies]) => {
-        // Update post object with thread details
+    .then(([thread, replyData]) => {
+        const { replies, totalLikes, totalDislikes } = replyData;
+
+        // Update post object with thread details and total likes/dislikes
         post = {
             author: thread.username,
             title: thread.title,
             content: thread.content,
             date: new Date(thread.date).toLocaleDateString(),
-            likes: thread.likes || 0,
-            dislikes: thread.dislikes || 0,
+            likes: totalLikes,
+            dislikes: totalDislikes,
             repliesCount: replies.length,
             replies: replies
         };
@@ -69,44 +71,45 @@ function renderPost() {
             <p>${post.content}</p>
             <small>${post.date}</small>
             <div class="interaction">
-                <span><i class='bx bx-like'></i> ${post.likes}</span>
-                <span><i class='bx bx-dislike'></i> ${post.dislikes}</span>
+                <span><i class='bx bx-like' onclick="handleLikeDislike('like')"></i> ${post.likes}</span>
+                <span><i class='bx bx-dislike' onclick="handleLikeDislike('dislike')"></i> ${post.dislikes}</span>
                 <span><i class='bx bx-chat'></i> ${post.repliesCount}</span>
             </div>
             <button class="reply-btn" onclick="addReplyToPost()">Reply</button>
-            ${
-                isAuthor
-                    ? `<div class="menu">
-                           <button class="menu-btn" onclick="toggleMenu(this)">...</button>
-                           <div class="menu-options" style="display:none;">
-                               <button onclick="deleteThread()">Delete</button>
-                           </div>
-                       </div>`
-                    : ""
-            }
         </div>
     `;
 }
 
 // Function to handle like or dislike for the main post
 function handleLikeDislike(action) {
-    if (action === "like" && !hasLikedPost) {
-        post.likes++;
-        hasLikedPost = true;
-        if (hasDislikedPost) {
-            post.dislikes--;
-            hasDislikedPost = false;
-        }
-    } else if (action === "dislike" && !hasDislikedPost) {
-        post.dislikes++;
-        hasDislikedPost = true;
-        if (hasLikedPost) {
-            post.likes--;
-            hasLikedPost = false;
-        }
+    const thread_id = getThreadIdFromURL();
+    if (!thread_id) {
+        console.error("Thread ID is missing");
+        return;
     }
-    document.getElementById("post-likes").innerText = post.likes;
-    document.getElementById("post-dislikes").innerText = post.dislikes;
+
+    fetch(`/threads/${thread_id}/likes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })  // action can be 'like' or 'dislike'
+    })
+    .then(response => response.json())
+    .then(() => loadThreadDetailsAndReplies())  // Refresh the thread and replies after liking/disliking
+    .catch(error => console.error("Error liking/disliking thread:", error));
+}
+
+// Function to handle like or dislike for a reply
+function handleLikeDislikeReply(reply_id, action) {
+    const username = localStorage.getItem("username");
+
+    fetch(`/replies/${reply_id}/likes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, username })  // Include username in request
+    })
+    .then(response => response.json())
+    .then(() => loadThreadDetailsAndReplies())  // Refresh replies after liking/disliking
+    .catch(error => console.error("Error liking/disliking reply:", error));
 }
 
 // Function to render all replies recursively
@@ -124,8 +127,8 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             <p>${reply.content}</p>
             <small>${new Date(reply.date).toLocaleDateString()}</small>
             <div class="interaction">
-                <span><i class='bx bx-like'></i> ${reply.likes || 0}</span>
-                <span><i class='bx bx-dislike'></i> ${reply.dislikes || 0}</span>
+                <span><i class='bx bx-like' onclick="handleLikeDislikeReply(${reply.reply_id}, 'like')"></i> ${reply.likes || 0}</span>
+                <span><i class='bx bx-dislike' onclick="handleLikeDislikeReply(${reply.reply_id}, 'dislike')"></i> ${reply.dislikes || 0}</span>
                 <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
             </div>
             ${
