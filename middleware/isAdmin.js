@@ -1,10 +1,10 @@
-// isAdmin Middleware
 const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
 async function isAdmin(req, res, next) {
-    const username = req.headers.username || req.body.username; // Get username from headers or body
+    const username = req.headers.username; // Assuming username is passed in the headers
     if (!username) {
+        console.error("Access denied: No username provided.");
         return res.status(403).json({ message: "Access denied. No username provided." });
     }
 
@@ -16,8 +16,10 @@ async function isAdmin(req, res, next) {
 
         const user = result.recordset[0];
         if (user && user.role === "admin") {
+            console.log(`User ${username} is an admin.`);
             next(); // User is an admin, proceed
         } else {
+            console.error(`Access denied: User ${username} is not an admin.`);
             res.status(403).json({ message: "Access denied. Admins only." });
         }
     } catch (error) {
@@ -26,4 +28,4 @@ async function isAdmin(req, res, next) {
     }
 }
 
-module.exports = { isAdmin };
+module.exports = isAdmin;
