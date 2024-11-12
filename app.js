@@ -6,9 +6,12 @@ const app = express();
 const port = 3000;
 const userController = require("./controllers/userController");
 const { createThread, deleteThread } = require("./controllers/threadController"); // Import corrected controller
+
 const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller');
-const { getRepliesByThreadId, addReply, deleteReply, likeReply } = require("./controllers/replyController");
 const isAdmin = require("./controllers/authMiddleware");
+const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller'); 
+const { getRepliesByThreadId, addReply, deleteReply, likeReply, likeThread, dislikeThread} = require("./controllers/replyController");
+
 
 const staticMiddleware = express.static("public");
 
@@ -23,8 +26,10 @@ app.post("/users/login", userController.login);
 app.post("/threads", createThread);
 app.get("/threads", getThreads);
 app.get("/threads/:thread_id", getThreadById);
-app.delete("/threads/:thread_id", deleteThread);
 
+app.delete("/threads/:thread_id", deleteThread); // Delete thread route
+app.post("/threads/:thread_id/like", likeThread);
+app.post("/threads/:thread_id/dislike", dislikeThread);
 // Reply routes
 app.get("/threads/:thread_id/replies", getRepliesByThreadId);
 app.post("/threads/:thread_id/replies", addReply);
