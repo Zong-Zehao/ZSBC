@@ -16,6 +16,10 @@ let post = {
     replies: []
 };
 
+// Variables to track if the user has liked or disliked the post
+let hasLikedPost = false;
+let hasDislikedPost = false;
+
 // Function to load thread details and replies
 function loadThreadDetailsAndReplies() {
     const thread_id = getThreadIdFromURL();
@@ -31,7 +35,7 @@ function loadThreadDetailsAndReplies() {
         fetch(`/threads/${thread_id}/replies`).then(response => response.json()) // Get replies
     ])
         .then(([thread, replyData]) => {
-            const { replies, totalLikes, totalDislikes } = replyData;
+            const { replies, totalLikes, totalDislikes, userReaction } = replyData;
 
             // Update post object with thread details and total likes/dislikes
             post = {
@@ -45,12 +49,16 @@ function loadThreadDetailsAndReplies() {
                 replies: replies
             };
 
+            // Update like/dislike state based on user reaction
+            hasLikedPost = userReaction === "like";
+            hasDislikedPost = userReaction === "dislike";
+
             // Render post and replies
             renderPost();
             renderAllReplies(replies);
         })
         .catch(error => {
-            console.error('Error loading thread or replies:', error);
+            console.error("Error loading thread or replies:", error);
             document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
         });
 }
@@ -72,15 +80,12 @@ function renderPost() {
             <p>${post.content}</p>
             <small>${post.date}</small>
             <div class="interaction">
-
-
                 <span>
-                    <i class='bx bx-like ${hasLikedPost ? 'active' : ''}' onclick="handleLikeDislikeThread('like')"></i>
+                    <i class='bx bx-like ${hasLikedPost ? "active" : ""}' onclick="handleLikeDislikeThread('like')"></i> ${post.likes}
                 </span>
                 <span>
-                    <i class='bx bx-dislike ${hasDislikedPost ? 'active' : ''}' onclick="handleLikeDislikeThread('dislike')"></i>
+                    <i class='bx bx-dislike ${hasDislikedPost ? "active" : ""}' onclick="handleLikeDislikeThread('dislike')"></i> ${post.dislikes}
                 </span>
-
                 <span><i class='bx bx-chat'></i> ${post.repliesCount}</span>
             </div>
             <button class="reply-btn" onclick="addReplyToPost()">Reply</button>
@@ -96,6 +101,7 @@ function renderPost() {
             }
         </div>
     `;
+}
 
 // Function to handle like or dislike for the main post
 function handleLikeDislikeThread(action) {
@@ -107,34 +113,34 @@ function handleLikeDislikeThread(action) {
         return;
     }
 
-    // Check if the user has already liked or disliked
-    if (action === 'like' && hasLikedPost) return;  // Prevent multiple likes
-    if (action === 'dislike' && hasDislikedPost) return;  // Prevent multiple dislikes
+    // Prevent multiple likes/dislikes
+    if (action === "like" && hasLikedPost) return;
+    if (action === "dislike" && hasDislikedPost) return;
 
     // Toggle like/dislike status
-    if (action === 'like') {
+    if (action === "like") {
         hasLikedPost = true;
-        hasDislikedPost = false; // If liked, reset dislike status
-    } else if (action === 'dislike') {
+        hasDislikedPost = false;
+    } else if (action === "dislike") {
         hasDislikedPost = true;
-        hasLikedPost = false; // If disliked, reset like status
+        hasLikedPost = false;
     }
 
     fetch(`/threads/${thread_id}/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })  // Include username in the request
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }) // Include username in the request
     })
-    .then(response => response.json())
-    .then((data) => {
-        if (data.message === "Thread liked successfully." || data.message === "Thread disliked successfully.") {
-            loadThreadDetailsAndReplies();  // Refresh thread details after action
-        } else {
-            console.error(data.message);
-        }
-    })
-    .catch(error => console.error(`Error ${action} thread:`, error));
-
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "Thread liked successfully." || data.message === "Thread disliked successfully.") {
+                loadThreadDetailsAndReplies(); // Refresh thread details after action
+            } else {
+                console.error(data.message);
+            }
+        })
+        .catch(error => console.error(`Error ${action} thread:`, error));
+}
 
 function renderAllReplies(replies, container = document.getElementById("reply-container"), parentId = null) {
     container.innerHTML = "";
@@ -176,13 +182,13 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
         renderAllReplies(replies, nestedContainer, reply.reply_id);
     });
 }
-// Function to toggle the visibility of the menu
-function toggleMenu(button) {
-    const menu = button.nextElementSibling;
-    menu.style.display = menu.style.display === "none" ? "block" : "none";
-}
-
-// Function to delete a thread
+// Function to toggle the visibility of the menu 
+function toggleMenu(button) { 
+    const menu = button.nextElementSibling; 
+    menu.style.display = menu.style.display === "none" ? "block" : "none"; 
+} 
+ 
+// Function to delete a thread 
 function deleteThread() {
     const thread_id = getThreadIdFromURL();
     const username = localStorage.getItem("username");
@@ -197,78 +203,78 @@ function deleteThread() {
         .then(data => {
             if (data.message === "Thread deleted successfully") {
                 console.log("Thread deleted:", thread_id);
-                window.location.href = "mainpage.html";
+                alert("Thread deleted successfully! Redirecting to main page...");
+                window.location.href = "mainpage.html"; // Redirect after deletion
             } else {
                 console.error("Delete failed:", data.message);
                 alert(data.message);
             }
         })
-        .catch(error => console.error("Error deleting thread:", error));
+        .catch(error => {
+            console.error("Error deleting thread:", error);
+            alert("An error occurred while deleting the thread.");
+        });
     }
 }
-
-
-// Function to delete a reply
-function deleteReply(reply_id) {
-    const username = localStorage.getItem("username");
-
-    if (confirm("Are you sure you want to delete this reply?")) {
-        fetch(`/replies/${reply_id}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
-        })
-            .then(response => response.json())
-            .then(() => loadThreadDetailsAndReplies()) // Refresh replies
-            .catch(error => console.error("Error deleting reply:", error));
-    }
-}
-// Function to add a reply to the main post
-function addReplyToPost() {
-    const replyContent = prompt("Enter your reply:");
-    if (!replyContent) return;
-
-    const thread_id = getThreadIdFromURL();
-    if (!thread_id) {
-        console.error("Thread ID is missing");
-        return;
-    }
-
-    const author = localStorage.getItem("username") || "Guest";
-
-    fetch(`/threads/${thread_id}/replies`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id: null })
-    })
-    .then(response => response.json())
-    .then(() => loadThreadDetailsAndReplies())
-    .catch(error => console.error('Error adding reply:', error));
-}
-
-// Function to add a reply to a reply
-function addReplyToReply(parent_reply_id, parentReplyElement) {
-    const replyContent = prompt("Enter your reply:");
-    if (!replyContent) return;
-
-    const thread_id = getThreadIdFromURL();
-    if (!thread_id) {
-        console.error("Thread ID is missing");
-        return;
-    }
-
-    const author = localStorage.getItem("username") || "Guest";
-
-    fetch(`/threads/${thread_id}/replies`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id })
-    })
-    .then(response => response.json())
-    .then(() => loadThreadDetailsAndReplies())
-    .catch(error => console.error('Error adding nested reply:', error));
-}
-
+// Function to delete a reply 
+function deleteReply(reply_id) { 
+    const username = localStorage.getItem("username"); 
+ 
+    if (confirm("Are you sure you want to delete this reply?")) { 
+        fetch(`/replies/${reply_id}`, { 
+            method: 'DELETE', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ username }) 
+        }) 
+            .then(response => response.json()) 
+            .then(() => loadThreadDetailsAndReplies()) // Refresh replies 
+            .catch(error => console.error("Error deleting reply:", error)); 
+    } 
+} 
+// Function to add a reply to the main post 
+function addReplyToPost() { 
+    const replyContent = prompt("Enter your reply:"); 
+    if (!replyContent) return; 
+ 
+    const thread_id = getThreadIdFromURL(); 
+    if (!thread_id) { 
+        console.error("Thread ID is missing"); 
+        return; 
+    } 
+ 
+    const author = localStorage.getItem("username") || "Guest"; 
+ 
+    fetch(`/threads/${thread_id}/replies`, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id: null }) 
+    }) 
+    .then(response => response.json()) 
+    .then(() => loadThreadDetailsAndReplies()) 
+    .catch(error => console.error('Error adding reply:', error)); 
+} 
+ 
+// Function to add a reply to a reply 
+function addReplyToReply(parent_reply_id, parentReplyElement) { 
+    const replyContent = prompt("Enter your reply:"); 
+    if (!replyContent) return; 
+ 
+    const thread_id = getThreadIdFromURL(); 
+    if (!thread_id) { 
+        console.error("Thread ID is missing"); 
+        return; 
+    } 
+ 
+    const author = localStorage.getItem("username") || "Guest"; 
+ 
+    fetch(`/threads/${thread_id}/replies`, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ thread_id, author, content: replyContent, parent_reply_id }) 
+    }) 
+    .then(response => response.json()) 
+    .then(() => loadThreadDetailsAndReplies()) 
+    .catch(error => console.error('Error adding nested reply:', error)); 
+} 
 // Load the thread details and replies when the page loads
 window.onload = loadThreadDetailsAndReplies;
-
