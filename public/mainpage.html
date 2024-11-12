@@ -29,6 +29,11 @@
 
         <div class="replies-container">
             <span class="replies-text">Threads</span>
+            
+            <!-- Category filter dropdown -->
+
+
+            <!-- Thread sorting dropdown -->
             <div class="dropdown">
                 <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
                 <ul class="dropdown-content" id="dropdownContent">
@@ -37,17 +42,36 @@
                     <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
                 </ul>
             </div>
+            <div class="dropdown-container">
+                <div class="dropdown">
+                    <select id="categoryFilter" class="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="Accounts">Accounts</option>
+                    <option value="Loans">Loans</option>
+                    <option value="Investments">Investments</option>
+                    <option value="Cards">Cards</option>
+                    <option value="Insurance">Insurance</option>
+                    <option value="Digital Banking">Digital Banking</option>
+                    <option value="Rewards">Rewards</option>
+                    <option value="Retirement">Retirement</option>
+                    <option value="Student Help">Student Help</option>
+                    <option value="Career Help">Career Help</option>
+                    <option value="Community">Community</option>
+                    <option value="News">News</option>
+                    <option value="General Support">General Support</option>
+                </select>
+            </div>
         </div>
 
     </article>
 
-    <!--show all threads start-->
+    <!-- Show all threads start -->
     <section id="threadsSection">
         <div id="threadsContainer" class="threads-container">
             <!-- Threads will be dynamically added here -->
         </div>
     </section>
-    <!--show all threads end-->
+    <!-- Show all threads end -->
 
     <script>
         // Function to update the dropdown button text
@@ -72,6 +96,7 @@
                 console.error('Error fetching threads:', error);
             });
         }
+
         function displayThreads(threads) {
             const threadsContainer = document.getElementById("threadsContainer");
             threadsContainer.innerHTML = '';
@@ -80,7 +105,6 @@
                 const threadElement = document.createElement("div");
                 threadElement.className = "thread";
 
-             
                 threadElement.onclick = () => {
                     window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
                 };
@@ -96,13 +120,21 @@
         }
 
 
-        document.getElementById("searchInput").addEventListener("input", function() {
-            const query = this.value.toLowerCase();
-            const filteredThreads = window.allThreads.filter(thread =>
-                thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query)
-            );
+        function filterThreads() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const selectedCategory = document.getElementById("categoryFilter").value;
+
+            const filteredThreads = window.allThreads.filter(thread => {
+                const matchesCategory = selectedCategory ? thread.category === selectedCategory : true;
+                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query);
+                return matchesCategory && matchesSearch;
+            });
+
             displayThreads(filteredThreads);
-        });
+        }
+
+        document.getElementById("searchInput").addEventListener("input", filterThreads);
+        document.getElementById("categoryFilter").addEventListener("change", filterThreads);
 
         // Load threads when the page loads
         window.onload = loadThreads;
