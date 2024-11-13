@@ -147,6 +147,10 @@ function handleLikeDislikeThread(action) {
         .catch(error => console.error(`Error ${action} thread:`, error));
 }
 
+function reloadPage() {
+    window.location.reload();
+}
+
 // Function to handle like or dislike for a reply
 function likeReply(reply_id, action) {
     const username = localStorage.getItem("username");
@@ -166,8 +170,8 @@ function likeReply(reply_id, action) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message.includes("success")) {
-            loadThreadDetailsAndReplies(); // Refresh thread and replies to update like/dislike counts
+        if (data.message.includes("Successfully")) {
+            loadThreadDetailsAndReplies()
         } else {
             console.error(data.message);
         }
