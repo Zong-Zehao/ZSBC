@@ -43,6 +43,7 @@ function loadThreadDetailsAndReplies() {
             post = {
                 author: thread.username,
                 title: thread.title,
+                category: thread.category,
                 content: thread.content,
                 date: new Date(thread.date).toLocaleDateString(),
                 likes: totalLikes,
