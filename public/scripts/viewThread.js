@@ -8,6 +8,7 @@ function getThreadIdFromURL() {
 let post = {
     author: "",
     title: "",
+    category:"",
     content: "",
     date: "",
     likes: 0,
@@ -37,10 +38,12 @@ function loadThreadDetailsAndReplies() {
         .then(([thread, replyData]) => {
             const { replies, totalLikes, totalDislikes, userReaction } = replyData;
 
+
             // Update post object with thread details and total likes/dislikes
             post = {
                 author: thread.username,
                 title: thread.title,
+                category: thread.category,
                 content: thread.content,
                 date: new Date(thread.date).toLocaleDateString(),
                 likes: totalLikes,
@@ -48,6 +51,7 @@ function loadThreadDetailsAndReplies() {
                 repliesCount: replies.length,
                 replies: replies
             };
+
 
             // Update like/dislike state based on user reaction
             hasLikedPost = userReaction === "like";
@@ -75,6 +79,7 @@ function renderPost() {
 
     postContainer.innerHTML = `
         <div class="post">
+            <span class="category-label">${post.category}</span> <!-- Category in top right -->
             <h3>${post.author}</h3>
             <h2>${post.title}</h2>
             <p>${post.content}</p>

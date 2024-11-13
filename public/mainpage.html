@@ -129,26 +129,28 @@
         }
 
         function displayThreads(threads) {
-            const threadsContainer = document.getElementById("threadsContainer");
-            threadsContainer.innerHTML = '';
+    const threadsContainer = document.getElementById("threadsContainer");
+    threadsContainer.innerHTML = '';
 
-            threads.forEach(thread => {
-                const threadElement = document.createElement("div");
-                threadElement.className = "thread";
+    threads.forEach(thread => {
+        const threadElement = document.createElement("div");
+        threadElement.className = "thread";
 
-                threadElement.onclick = () => {
-                    window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
-                };
+        threadElement.onclick = () => {
+            window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+        };
 
-                threadElement.innerHTML = `
-                    <h3>${thread.title}</h3>
-                    <p>${thread.content}</p>
-                    <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
-                `;
+        threadElement.innerHTML = `
+            <h3>${thread.title}</h3>
+            <p class="thread-category">${thread.category}</p>
+            <p>${thread.content}</p>
+            <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
+        `;
 
-                threadsContainer.appendChild(threadElement);
-            });
-        }
+        threadsContainer.appendChild(threadElement);
+    });
+}
+
 
         document.getElementById("searchInput").addEventListener("input", function () {
             const query = this.value.toLowerCase();

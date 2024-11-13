@@ -184,3 +184,26 @@ body {
     width: 100%;
     text-align: left;
 }
+
+.post {
+    position: relative; 
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.category-label {
+    position: absolute;
+    top: 10px;
+    right: 10px; 
+    background-color: #131414; 
+    color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 30px; 
+    font-size: 16px; 
+    font-weight: bold;
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+
+}
