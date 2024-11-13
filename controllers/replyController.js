@@ -67,22 +67,36 @@ async function deleteReply(req, res) {
 
     try {
         const pool = await sql.connect(dbConfig);
-        const reply = await pool
-            .request()
+
+        // Check the user's role
+        const userResult = await pool.request()
+            .input("username", sql.VarChar, username)
+            .query("SELECT role FROM Users WHERE username = @username");
+
+        const user = userResult.recordset[0];
+        if (!user) {
+            return res.status(403).json({ message: "User not found" });
+        }
+
+        const isAdmin = user.role === "admin";
+
+        // Check reply ownership or admin privilege
+        const replyResult = await pool.request()
             .input("reply_id", sql.Int, reply_id)
             .query("SELECT author FROM Replies WHERE reply_id = @reply_id");
 
-        if (!reply.recordset.length) {
+        const reply = replyResult.recordset[0];
+        if (!reply) {
             return res.status(404).json({ message: "Reply not found" });
         }
 
-        const replyAuthor = reply.recordset[0].author;
-        if (replyAuthor !== username) {
+        // Allow deletion if admin or reply owner
+        if (reply.author !== username && !isAdmin) {
             return res.status(403).json({ message: "You can only delete your own replies" });
         }
 
-        await pool
-            .request()
+        // Delete the reply
+        await pool.request()
             .input("reply_id", sql.Int, reply_id)
             .query("DELETE FROM Replies WHERE reply_id = @reply_id");
 
@@ -90,6 +104,108 @@ async function deleteReply(req, res) {
     } catch (error) {
         console.error("Error deleting reply:", error);
         res.status(500).json({ message: "Failed to delete reply" });
+    }
+}
+
+// Like a thread
+async function likeThread(req, res) {
+    const { thread_id } = req.params;
+    const { username } = req.body; 
+
+    try {
+        const pool = await sql.connect(dbConfig);
+
+        // Fetch current likes and dislikes as JSON arrays
+        const threadResult = await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .query("SELECT likes, dislikes FROM Threads WHERE thread_id = @thread_id");
+
+        if (!threadResult.recordset.length) {
+            return res.status(404).json({ message: "Thread not found" });
+        }
+
+        let { likes, dislikes } = threadResult.recordset[0];
+        likes = JSON.parse(likes || "[]");
+        dislikes = JSON.parse(dislikes || "[]");
+
+        // Check if the user already liked the thread
+        if (likes.includes(username)) {
+            return res.status(403).json({ message: "You have already liked this thread." });
+        }
+
+        // Remove user from dislikes if they previously disliked the thread
+        dislikes = dislikes.filter(user => user !== username);
+        likes.push(username);
+
+        // Update likes and dislikes in the Threads table
+        await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .input("likes", sql.VarChar, JSON.stringify(likes))
+            .input("dislikes", sql.VarChar, JSON.stringify(dislikes))
+            .input("total_likes", sql.Int, likes.length)
+            .input("total_dislikes", sql.Int, dislikes.length)
+            .query(`
+                UPDATE Threads 
+                SET likes = @likes, dislikes = @dislikes, 
+                    total_likes = @total_likes, total_dislikes = @total_dislikes 
+                WHERE thread_id = @thread_id
+            `);
+
+        res.status(200).json({ message: "Thread liked successfully." });
+    } catch (error) {
+        console.error("Error liking thread:", error);
+        res.status(500).json({ message: "Error liking thread" });
+    }
+}
+
+// Dislike a thread
+async function dislikeThread(req, res) {
+    const { thread_id } = req.params;
+    const { username } = req.body;
+
+    try {
+        const pool = await sql.connect(dbConfig);
+
+        // Fetch current likes and dislikes as JSON arrays
+        const threadResult = await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .query("SELECT likes, dislikes FROM Threads WHERE thread_id = @thread_id");
+
+        if (!threadResult.recordset.length) {
+            return res.status(404).json({ message: "Thread not found" });
+        }
+
+        let { likes, dislikes } = threadResult.recordset[0];
+        likes = JSON.parse(likes || "[]");
+        dislikes = JSON.parse(dislikes || "[]");
+
+        // Check if the user already disliked the thread
+        if (dislikes.includes(username)) {
+            return res.status(403).json({ message: "You have already disliked this thread." });
+        }
+
+        // Remove user from likes if they previously liked the thread
+        likes = likes.filter(user => user !== username);
+        dislikes.push(username);
+
+        // Update likes and dislikes in the Threads table
+        await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .input("likes", sql.VarChar, JSON.stringify(likes))
+            .input("dislikes", sql.VarChar, JSON.stringify(dislikes))
+            .input("total_likes", sql.Int, likes.length)
+            .input("total_dislikes", sql.Int, dislikes.length)
+            .query(`
+                UPDATE Threads 
+                SET likes = @likes, dislikes = @dislikes, 
+                    total_likes = @total_likes, total_dislikes = @total_dislikes 
+                WHERE thread_id = @thread_id
+            `);
+
+        res.status(200).json({ message: "Thread disliked successfully." });
+    } catch (error) {
+        console.error("Error disliking thread:", error);
+        res.status(500).json({ message: "Error disliking thread" });
     }
 }
 
@@ -194,4 +310,6 @@ module.exports = {
     deleteReply,
     likeReply,
     updateReputations,
+    likeThread,
+    dislikeThread,
 };
