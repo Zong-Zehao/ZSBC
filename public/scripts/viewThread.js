@@ -139,7 +139,10 @@ function handleLikeDislikeThread(action) {
         .then(response => response.json())
         .then(data => {
             if (data.message === "Thread liked successfully." || data.message === "Thread disliked successfully.") {
-                loadThreadDetailsAndReplies(); // Refresh thread details after action
+                // Update the like and dislike counts without reloading the entire thread
+                post.likes = data.total_likes;
+                post.dislikes = data.total_dislikes;
+                renderPost(); // Re-render the post with updated counts
             } else {
                 console.error(data.message);
             }

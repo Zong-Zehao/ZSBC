@@ -1,7 +1,7 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
-// Get replies by thread_id, including nested replies and calculate total likes and dislikes
+// Get replies by thread_id, including nested replies
 async function getRepliesByThreadId(req, res) {
     const thread_id = req.params.thread_id;
     try {
@@ -12,26 +12,10 @@ async function getRepliesByThreadId(req, res) {
             .input('thread_id', sql.Int, thread_id)
             .query("SELECT * FROM Replies WHERE thread_id = @thread_id ORDER BY date ASC");
 
-        // Calculate total likes and dislikes for all replies in the thread
-        const likesDislikesResult = await pool.request()
-            .input('thread_id', sql.Int, thread_id)
-            .query(`
-                SELECT 
-                    SUM(likes) AS totalLikes, 
-                    SUM(dislikes) AS totalDislikes 
-                FROM Replies 
-                WHERE thread_id = @thread_id
-            `);
-
         const replies = repliesResult.recordset;
-        const { totalLikes, totalDislikes } = likesDislikesResult.recordset[0];
 
-        // Return both replies and total likes/dislikes
-        res.json({
-            replies,
-            totalLikes: totalLikes || 0, // Default to 0 if null
-            totalDislikes: totalDislikes || 0
-        });
+        // Return replies only, without total likes/dislikes
+        res.json({ replies });
     } catch (error) {
         console.error("Error fetching replies:", error);
         res.status(500).json({ message: "Error retrieving replies" });
@@ -115,35 +99,42 @@ async function likeThread(req, res) {
     try {
         const pool = await sql.connect(dbConfig);
 
-        // Fetch current likes and dislikes as JSON arrays
+        // Fetch the thread owner, likes, and dislikes
         const threadResult = await pool.request()
             .input("thread_id", sql.Int, thread_id)
-            .query("SELECT likes, dislikes FROM Threads WHERE thread_id = @thread_id");
+            .query("SELECT username AS owner, likes, dislikes FROM Threads WHERE thread_id = @thread_id");
 
         if (!threadResult.recordset.length) {
             return res.status(404).json({ message: "Thread not found" });
         }
 
-        let { likes, dislikes } = threadResult.recordset[0];
-        likes = JSON.parse(likes || "[]");
-        dislikes = JSON.parse(dislikes || "[]");
+        const { owner, likes, dislikes } = threadResult.recordset[0];
+
+        // Check if the user is the thread owner
+        if (username === owner) {
+            return res.status(403).json({ message: "You cannot like or dislike your own thread." });
+        }
+
+        // Convert likes and dislikes from JSON format if not null
+        let parsedLikes = JSON.parse(likes || "[]");
+        let parsedDislikes = JSON.parse(dislikes || "[]");
 
         // Check if the user already liked the thread
-        if (likes.includes(username)) {
+        if (parsedLikes.includes(username)) {
             return res.status(403).json({ message: "You have already liked this thread." });
         }
 
         // Remove user from dislikes if they previously disliked the thread
-        dislikes = dislikes.filter(user => user !== username);
-        likes.push(username);
+        parsedDislikes = parsedDislikes.filter(user => user !== username);
+        parsedLikes.push(username);
 
         // Update likes and dislikes in the Threads table
         await pool.request()
             .input("thread_id", sql.Int, thread_id)
-            .input("likes", sql.VarChar, JSON.stringify(likes))
-            .input("dislikes", sql.VarChar, JSON.stringify(dislikes))
-            .input("total_likes", sql.Int, likes.length)
-            .input("total_dislikes", sql.Int, dislikes.length)
+            .input("likes", sql.VarChar, JSON.stringify(parsedLikes))
+            .input("dislikes", sql.VarChar, JSON.stringify(parsedDislikes))
+            .input("total_likes", sql.Int, parsedLikes.length)
+            .input("total_dislikes", sql.Int, parsedDislikes.length)
             .query(`
                 UPDATE Threads 
                 SET likes = @likes, dislikes = @dislikes, 
@@ -151,7 +142,11 @@ async function likeThread(req, res) {
                 WHERE thread_id = @thread_id
             `);
 
-        res.status(200).json({ message: "Thread liked successfully." });
+        res.status(200).json({ 
+            message: "Thread liked successfully.",
+            total_likes: parsedLikes.length,
+            total_dislikes: parsedDislikes.length 
+        });
     } catch (error) {
         console.error("Error liking thread:", error);
         res.status(500).json({ message: "Error liking thread" });
@@ -166,35 +161,42 @@ async function dislikeThread(req, res) {
     try {
         const pool = await sql.connect(dbConfig);
 
-        // Fetch current likes and dislikes as JSON arrays
+        // Fetch the thread owner, likes, and dislikes
         const threadResult = await pool.request()
             .input("thread_id", sql.Int, thread_id)
-            .query("SELECT likes, dislikes FROM Threads WHERE thread_id = @thread_id");
+            .query("SELECT username AS owner, likes, dislikes FROM Threads WHERE thread_id = @thread_id");
 
         if (!threadResult.recordset.length) {
             return res.status(404).json({ message: "Thread not found" });
         }
 
-        let { likes, dislikes } = threadResult.recordset[0];
-        likes = JSON.parse(likes || "[]");
-        dislikes = JSON.parse(dislikes || "[]");
+        const { owner, likes, dislikes } = threadResult.recordset[0];
+
+        // Check if the user is the thread owner
+        if (username === owner) {
+            return res.status(403).json({ message: "You cannot like or dislike your own thread." });
+        }
+
+        // Convert likes and dislikes from JSON format if not null
+        let parsedLikes = JSON.parse(likes || "[]");
+        let parsedDislikes = JSON.parse(dislikes || "[]");
 
         // Check if the user already disliked the thread
-        if (dislikes.includes(username)) {
+        if (parsedDislikes.includes(username)) {
             return res.status(403).json({ message: "You have already disliked this thread." });
         }
 
         // Remove user from likes if they previously liked the thread
-        likes = likes.filter(user => user !== username);
-        dislikes.push(username);
+        parsedLikes = parsedLikes.filter(user => user !== username);
+        parsedDislikes.push(username);
 
         // Update likes and dislikes in the Threads table
         await pool.request()
             .input("thread_id", sql.Int, thread_id)
-            .input("likes", sql.VarChar, JSON.stringify(likes))
-            .input("dislikes", sql.VarChar, JSON.stringify(dislikes))
-            .input("total_likes", sql.Int, likes.length)
-            .input("total_dislikes", sql.Int, dislikes.length)
+            .input("likes", sql.VarChar, JSON.stringify(parsedLikes))
+            .input("dislikes", sql.VarChar, JSON.stringify(parsedDislikes))
+            .input("total_likes", sql.Int, parsedLikes.length)
+            .input("total_dislikes", sql.Int, parsedDislikes.length)
             .query(`
                 UPDATE Threads 
                 SET likes = @likes, dislikes = @dislikes, 
@@ -202,7 +204,11 @@ async function dislikeThread(req, res) {
                 WHERE thread_id = @thread_id
             `);
 
-        res.status(200).json({ message: "Thread disliked successfully." });
+        res.status(200).json({ 
+            message: "Thread disliked successfully.",
+            total_likes: parsedLikes.length,
+            total_dislikes: parsedDislikes.length 
+        });
     } catch (error) {
         console.error("Error disliking thread:", error);
         res.status(500).json({ message: "Error disliking thread" });
