@@ -67,22 +67,36 @@ async function deleteReply(req, res) {
 
     try {
         const pool = await sql.connect(dbConfig);
-        const reply = await pool
-            .request()
+
+        // Check the user's role
+        const userResult = await pool.request()
+            .input("username", sql.VarChar, username)
+            .query("SELECT role FROM Users WHERE username = @username");
+
+        const user = userResult.recordset[0];
+        if (!user) {
+            return res.status(403).json({ message: "User not found" });
+        }
+
+        const isAdmin = user.role === "admin";
+
+        // Check reply ownership or admin privilege
+        const replyResult = await pool.request()
             .input("reply_id", sql.Int, reply_id)
             .query("SELECT author FROM Replies WHERE reply_id = @reply_id");
 
-        if (!reply.recordset.length) {
+        const reply = replyResult.recordset[0];
+        if (!reply) {
             return res.status(404).json({ message: "Reply not found" });
         }
 
-        const replyAuthor = reply.recordset[0].author;
-        if (replyAuthor !== username) {
+        // Allow deletion if admin or reply owner
+        if (reply.author !== username && !isAdmin) {
             return res.status(403).json({ message: "You can only delete your own replies" });
         }
 
-        await pool
-            .request()
+        // Delete the reply
+        await pool.request()
             .input("reply_id", sql.Int, reply_id)
             .query("DELETE FROM Replies WHERE reply_id = @reply_id");
 
