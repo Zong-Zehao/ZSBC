@@ -156,14 +156,26 @@ function reloadPage() {
 function likeReply(reply_id, action) {
     const username = localStorage.getItem("username");
 
-    // Prevent multiple likes/dislikes
+    // Select the reply element and ensure it's found
     const reply = document.getElementById(`reply-${reply_id}`);
+    if (!reply) {
+        console.error("Reply element not found");
+        return;
+    }
+
+    // Get like and dislike elements within the reply
+    const likeCountElement = reply.querySelector(".like-count");
+    const dislikeCountElement = reply.querySelector(".dislike-count");
     const likeIcon = reply.querySelector(".bx-like");
     const dislikeIcon = reply.querySelector(".bx-dislike");
 
-    if (action === "like" && likeIcon.classList.contains("active")) return;
-    if (action === "dislike" && dislikeIcon.classList.contains("active")) return;
+    // Prevent double-clicks by checking if the action is already active
+    if ((action === "like" && likeIcon.classList.contains("active")) || 
+        (action === "dislike" && dislikeIcon.classList.contains("active"))) {
+        return;
+    }
 
+    // Send the request to the server
     fetch(`/replies/${reply_id}/likes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -171,10 +183,47 @@ function likeReply(reply_id, action) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message.includes("Successfully")) {
-            loadThreadDetailsAndReplies()
+        // Modify success condition to look for "success" in any format
+        if (data.message.toLowerCase().includes("success")) {
+            // Initialize counts to zero if they're empty or invalid
+            let currentLikes = parseInt(likeCountElement.textContent) || 0;
+            let currentDislikes = parseInt(dislikeCountElement.textContent) || 0;
+
+            console.log("Initial counts:", { currentLikes, currentDislikes });
+
+            // Update counts based on the action
+            if (action === "like") {
+                likeCountElement.textContent = currentLikes + 1;
+
+                // Decrease dislikes count if a dislike was previously active
+                if (dislikeIcon.classList.contains("active")) {
+                    dislikeCountElement.textContent = currentDislikes - 1;
+                }
+
+                // Toggle the active state for like and dislike icons
+                likeIcon.classList.add("active");
+                dislikeIcon.classList.remove("active");
+
+            } else if (action === "dislike") {
+                dislikeCountElement.textContent = currentDislikes + 1;
+
+                // Decrease likes count if a like was previously active
+                if (likeIcon.classList.contains("active")) {
+                    likeCountElement.textContent = currentLikes - 1;
+                }
+
+                // Toggle the active state for like and dislike icons
+                dislikeIcon.classList.add("active");
+                likeIcon.classList.remove("active");
+            }
+
+            console.log(`Successfully switched to ${action} for the reply`);
+            console.log("Updated counts:", {
+                likeCount: likeCountElement.textContent,
+                dislikeCount: dislikeCountElement.textContent
+            });
         } else {
-            console.error(data.message);
+            console.error("Unexpected server response:", data.message);
         }
     })
     .catch(error => console.error(`Error ${action}ing reply:`, error));
@@ -201,23 +250,16 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             <small>${new Date(reply.date).toLocaleDateString()}</small>
             <div class="interaction">
                 <span>
-                    <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> ${reply.likes || 0}
+                    <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> 
+                    <span class="like-count">${reply.likes || 0}</span>
                 </span>
                 <span>
-                    <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> ${reply.dislikes || 0}
+                    <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> 
+                    <span class="dislike-count">${reply.dislikes || 0}</span>
                 </span>
                 <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
             </div>
-            ${
-                isAuthor || isAdmin
-                    ? `<div class="menu">
-                           <button class="menu-btn" onclick="toggleMenu(this)">...</button>
-                           <div class="menu-options" style="display:none;">
-                               <button onclick="deleteReply(${reply.reply_id})">Delete Reply</button>
-                           </div>
-                       </div>`
-                    : ""
-            }
+            ...
         `;
 
         const nestedContainer = document.createElement("div");
