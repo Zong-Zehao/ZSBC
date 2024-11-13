@@ -35,25 +35,54 @@ async function deleteThread(req, res) {
 
     try {
         const pool = await sql.connect(dbConfig);
-        const thread = await pool
-            .request()
+
+        // Debug user role and username
+        console.log(`Username: ${username}, Thread ID: ${thread_id}`);
+
+        // Check the user's role
+        const userResult = await pool.request()
+            .input("username", sql.VarChar, username)
+            .query("SELECT role FROM Users WHERE username = @username");
+
+        if (userResult.recordset.length === 0) {
+            console.log("User not found");
+            return res.status(403).json({ message: "User not found" });
+        }
+
+        const user = userResult.recordset[0];
+        const isAdmin = user.role === "admin";
+        console.log(`User Role: ${user.role}, Is Admin: ${isAdmin}`);
+
+        // Check thread ownership or admin privilege
+        const threadResult = await pool.request()
             .input("thread_id", sql.Int, thread_id)
             .query("SELECT username FROM Threads WHERE thread_id = @thread_id");
 
-        if (!thread.recordset.length) {
+        if (threadResult.recordset.length === 0) {
+            console.log("Thread not found");
             return res.status(404).json({ message: "Thread not found" });
         }
 
-        const threadAuthor = thread.recordset[0].username;
-        if (threadAuthor !== username) {
+        const thread = threadResult.recordset[0];
+        console.log(`Thread Owner: ${thread.username}, Admin: ${isAdmin}, Requester: ${username}`);
+
+        // Allow deletion if admin or thread owner
+        if (!isAdmin && thread.username !== username) {
+            console.log("Permission denied: Not admin or owner");
             return res.status(403).json({ message: "You can only delete your own threads" });
         }
 
-        await pool
-            .request()
+        // Delete replies associated with the thread
+        await pool.request()
+            .input("thread_id", sql.Int, thread_id)
+            .query("DELETE FROM Replies WHERE thread_id = @thread_id");
+
+        // Delete the thread
+        await pool.request()
             .input("thread_id", sql.Int, thread_id)
             .query("DELETE FROM Threads WHERE thread_id = @thread_id");
 
+        console.log("Thread deleted successfully");
         res.status(200).json({ message: "Thread deleted successfully" });
     } catch (error) {
         console.error("Error deleting thread:", error);
