@@ -101,7 +101,7 @@ async function deleteReply(req, res) {
 // Like a thread
 async function likeThread(req, res) {
     const { thread_id } = req.params;
-    const { username } = req.body; 
+    const { username } = req.body;
 
     try {
         const pool = await sql.connect(dbConfig);
@@ -131,8 +131,12 @@ async function likeThread(req, res) {
             return res.status(403).json({ message: "You have already liked this thread." });
         }
 
-        // Remove user from dislikes if they previously disliked the thread
-        parsedDislikes = parsedDislikes.filter(user => user !== username);
+        // If the user has previously disliked the thread, remove the dislike
+        if (parsedDislikes.includes(username)) {
+            parsedDislikes = parsedDislikes.filter(user => user !== username);
+        }
+
+        // Add the user to the likes array
         parsedLikes.push(username);
 
         // Update likes and dislikes in the Threads table
@@ -148,6 +152,9 @@ async function likeThread(req, res) {
                     total_likes = @total_likes, total_dislikes = @total_dislikes 
                 WHERE thread_id = @thread_id
             `);
+
+        // Update reputations after liking the thread
+        await updateReputations(pool);
 
         res.status(200).json({ 
             message: "Thread liked successfully.",
@@ -193,8 +200,12 @@ async function dislikeThread(req, res) {
             return res.status(403).json({ message: "You have already disliked this thread." });
         }
 
-        // Remove user from likes if they previously liked the thread
-        parsedLikes = parsedLikes.filter(user => user !== username);
+        // If the user has previously liked the thread, remove the like
+        if (parsedLikes.includes(username)) {
+            parsedLikes = parsedLikes.filter(user => user !== username);
+        }
+
+        // Add the user to the dislikes array
         parsedDislikes.push(username);
 
         // Update likes and dislikes in the Threads table
@@ -211,6 +222,9 @@ async function dislikeThread(req, res) {
                 WHERE thread_id = @thread_id
             `);
 
+        // Update reputations after disliking the thread
+        await updateReputations(pool);
+
         res.status(200).json({ 
             message: "Thread disliked successfully.",
             total_likes: parsedLikes.length,
@@ -225,7 +239,7 @@ async function dislikeThread(req, res) {
 // Like or dislike a reply
 async function likeReply(req, res) {
     const { reply_id } = req.params;
-    const { action, username } = req.body;  // 'like' or 'dislike' and username
+    const { action, username } = req.body; // 'like' or 'dislike' and username
 
     try {
         const pool = await sql.connect(dbConfig);
@@ -266,7 +280,8 @@ async function likeReply(req, res) {
                     .input("reacted_to", sql.VarChar, replyAuthor)
                     .query("UPDATE ReplyReactions SET reaction_type = @reaction_type, reacted_to = @reacted_to WHERE reply_id = @reply_id AND username = @username");
 
-                await updateReputations(pool, reply_id);
+                // Update reputations after liking/disliking the reply
+                await updateReputations(pool);
                 return res.status(200).json({ message: `Successfully switched to ${action} for the reply` });
             }
         } else {
@@ -278,29 +293,38 @@ async function likeReply(req, res) {
                 .input("reacted_to", sql.VarChar, replyAuthor)
                 .query("INSERT INTO ReplyReactions (reply_id, username, reaction_type, reacted_to) VALUES (@reply_id, @username, @reaction_type, @reacted_to)");
 
+            // Update reputations after liking/disliking the reply
+            await updateReputations(pool);
             return res.status(200).json({ message: `${action}d reply successfully` });
         }
     } catch (error) {
         console.error("Error liking/disliking reply:", error);
-        res.status(500).json({ message: "Error liking/disliking reply" });
+        res.status(500).json({ message: "Error liking/disliking reply or updating reputations" });
     }
 }
 
-// Update reputation for all users based on likes and dislikes
-async function updateReputations(req, res) {
+// Update reputation for all users based on likes for threads and replies
+async function updateReputations(pool) {
     try {
-        const pool = await sql.connect(dbConfig);
+        // Update reputation based on likes/dislikes on replies and threads
         await pool.request().query(`
             UPDATE Users
             SET reputation = (
-                SELECT COALESCE(SUM(CASE WHEN reaction_type = 'like' THEN 1 WHEN reaction_type = 'dislike' THEN -1 ELSE 0 END), 0)
-                FROM ReplyReactions
-                WHERE reacted_to = Users.username
+                (SELECT COALESCE(SUM(total_likes), 0)
+                 FROM Threads
+                 WHERE username = Users.username)
+                +
+                (SELECT COALESCE(SUM(
+                    CASE WHEN reaction_type = 'like' THEN 1 ELSE 0 END), 0)
+                 FROM ReplyReactions
+                 WHERE reacted_to = Users.username)
             )
         `);
-        
-        res.status(200).json({ message: "User reputations updated successfully" });
+
+        return { success: true };
     } catch (error) {
+        console.error("Error updating reputations:", error);
+        return { success: false, error };
     }
 }
 
