@@ -128,6 +128,20 @@
             displayThreads(sortedThreads);
         }
 
+        function filterThreads() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const selectedCategory = document.getElementById("categoryFilter").value;
+            const filteredThreads = window.allThreads.filter(thread => {
+                const matchesCategory = selectedCategory ? thread.category === selectedCategory : true;
+                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query);
+                return matchesCategory && matchesSearch;
+            });
+            displayThreads(filteredThreads);
+        }
+
+        document.getElementById("searchInput").addEventListener("input", filterThreads);
+        document.getElementById("categoryFilter").addEventListener("change", filterThreads);
+
         function displayThreads(threads) {
     const threadsContainer = document.getElementById("threadsContainer");
     threadsContainer.innerHTML = '';
