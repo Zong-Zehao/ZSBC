@@ -36,8 +36,7 @@ function loadThreadDetailsAndReplies() {
         fetch(`/threads/${thread_id}/replies`).then(response => response.json()) // Get replies
     ])
         .then(([thread, replyData]) => {
-            const { replies, totalLikes, totalDislikes, userReaction } = replyData;
-
+            const { replies, userReaction } = replyData;
 
             // Update post object with thread details and total likes/dislikes
             post = {
@@ -46,12 +45,11 @@ function loadThreadDetailsAndReplies() {
                 category: thread.category,
                 content: thread.content,
                 date: new Date(thread.date).toLocaleDateString(),
-                likes: totalLikes,
-                dislikes: totalDislikes,
+                likes: thread.total_likes, // Access totalLikes from the thread directly
+                dislikes: thread.total_dislikes, // Access totalDislikes from the thread directly
                 repliesCount: replies.length,
                 replies: replies
             };
-
 
             // Update like/dislike state based on user reaction
             hasLikedPost = userReaction === "like";
