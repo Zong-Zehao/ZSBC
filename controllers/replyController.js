@@ -7,14 +7,21 @@ async function getRepliesByThreadId(req, res) {
     try {
         const pool = await sql.connect(dbConfig);
 
-        // Fetch replies for the thread
+        // Fetch replies with like and dislike counts
         const repliesResult = await pool.request()
             .input('thread_id', sql.Int, thread_id)
-            .query("SELECT * FROM Replies WHERE thread_id = @thread_id ORDER BY date ASC");
+            .query(`
+                SELECT r.*, 
+                    (SELECT COUNT(*) FROM ReplyReactions rr WHERE rr.reply_id = r.reply_id AND rr.reaction_type = 'like') AS likes,
+                    (SELECT COUNT(*) FROM ReplyReactions rr WHERE rr.reply_id = r.reply_id AND rr.reaction_type = 'dislike') AS dislikes
+                FROM Replies r
+                WHERE r.thread_id = @thread_id
+                ORDER BY r.date ASC
+            `);
 
         const replies = repliesResult.recordset;
 
-        // Return replies only, without total likes/dislikes
+        // Return replies with like/dislike counts
         res.json({ replies });
     } catch (error) {
         console.error("Error fetching replies:", error);
@@ -233,7 +240,7 @@ async function likeReply(req, res) {
         }
 
         const replyAuthor = replyResult.recordset[0].author;
-        
+
         // Check if the user is the author of the reply
         if (replyAuthor === username) {
             return res.status(403).json({ message: "You cannot like or dislike your own reply" });
@@ -259,14 +266,7 @@ async function likeReply(req, res) {
                     .input("reacted_to", sql.VarChar, replyAuthor)
                     .query("UPDATE ReplyReactions SET reaction_type = @reaction_type, reacted_to = @reacted_to WHERE reply_id = @reply_id AND username = @username");
 
-                // Adjust like and dislike counts
-                const incrementField = action === 'like' ? 'likes' : 'dislikes';
-                const decrementField = action === 'like' ? 'dislikes' : 'likes';
-                await pool.request()
-                    .input("reply_id", sql.Int, reply_id)
-                    .query(`UPDATE Replies SET ${incrementField} = ${incrementField} + 1, ${decrementField} = ${decrementField} - 1 WHERE reply_id = @reply_id`);
-                    await updateReputations(pool, reply_id);
-                
+                await updateReputations(pool, reply_id);
                 return res.status(200).json({ message: `Successfully switched to ${action} for the reply` });
             }
         } else {
@@ -277,12 +277,6 @@ async function likeReply(req, res) {
                 .input("reaction_type", sql.VarChar, action)
                 .input("reacted_to", sql.VarChar, replyAuthor)
                 .query("INSERT INTO ReplyReactions (reply_id, username, reaction_type, reacted_to) VALUES (@reply_id, @username, @reaction_type, @reacted_to)");
-
-            // Increment the like or dislike count
-            const likeDislikeField = action === 'like' ? 'likes' : 'dislikes';
-            await pool.request()
-                .input("reply_id", sql.Int, reply_id)
-                .query(`UPDATE Replies SET ${likeDislikeField} = ${likeDislikeField} + 1 WHERE reply_id = @reply_id`);
 
             return res.status(200).json({ message: `${action}d reply successfully` });
         }

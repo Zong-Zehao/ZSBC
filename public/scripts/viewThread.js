@@ -35,34 +35,34 @@ function loadThreadDetailsAndReplies() {
         fetch(`/threads/${thread_id}`).then(response => response.json()), // Get thread details
         fetch(`/threads/${thread_id}/replies`).then(response => response.json()) // Get replies
     ])
-        .then(([thread, replyData]) => {
-            const { replies, userReaction } = replyData;
+    .then(([thread, replyData]) => {
+        const { replies, userReaction } = replyData;
 
-            // Update post object with thread details and total likes/dislikes
-            post = {
-                author: thread.username,
-                title: thread.title,
-                category: thread.category,
-                content: thread.content,
-                date: new Date(thread.date).toLocaleDateString(),
-                likes: thread.total_likes, // Access totalLikes from the thread directly
-                dislikes: thread.total_dislikes, // Access totalDislikes from the thread directly
-                repliesCount: replies.length,
-                replies: replies
-            };
+        // Update post object with thread details and total likes/dislikes
+        post = {
+            author: thread.username,
+            title: thread.title,
+            category: thread.category,
+            content: thread.content,
+            date: new Date(thread.date).toLocaleDateString(),
+            likes: thread.total_likes, // Access totalLikes from the thread directly
+            dislikes: thread.total_dislikes, // Access totalDislikes from the thread directly
+            repliesCount: replies.length,
+            replies: replies
+        };
 
-            // Update like/dislike state based on user reaction
-            hasLikedPost = userReaction === "like";
-            hasDislikedPost = userReaction === "dislike";
+        // Update like/dislike state based on user reaction
+        hasLikedPost = userReaction === "like";
+        hasDislikedPost = userReaction === "dislike";
 
-            // Render post and replies
-            renderPost();
-            renderAllReplies(replies);
-        })
-        .catch(error => {
-            console.error("Error loading thread or replies:", error);
-            document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
-        });
+        // Render post and replies
+        renderPost();
+        renderAllReplies(replies);
+    })
+    .catch(error => {
+        console.error("Error loading thread or replies:", error);
+        document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
+    });
 }
 
 // Render the main post
@@ -156,26 +156,6 @@ function reloadPage() {
 function likeReply(reply_id, action) {
     const username = localStorage.getItem("username");
 
-    // Select the reply element and ensure it's found
-    const reply = document.getElementById(`reply-${reply_id}`);
-    if (!reply) {
-        console.error("Reply element not found");
-        return;
-    }
-
-    // Get like and dislike elements within the reply
-    const likeCountElement = reply.querySelector(".like-count");
-    const dislikeCountElement = reply.querySelector(".dislike-count");
-    const likeIcon = reply.querySelector(".bx-like");
-    const dislikeIcon = reply.querySelector(".bx-dislike");
-
-    // Prevent double-clicks by checking if the action is already active
-    if ((action === "like" && likeIcon.classList.contains("active")) || 
-        (action === "dislike" && dislikeIcon.classList.contains("active"))) {
-        return;
-    }
-
-    // Send the request to the server
     fetch(`/replies/${reply_id}/likes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -183,45 +163,8 @@ function likeReply(reply_id, action) {
     })
     .then(response => response.json())
     .then(data => {
-        // Modify success condition to look for "success" in any format
         if (data.message.toLowerCase().includes("success")) {
-            // Initialize counts to zero if they're empty or invalid
-            let currentLikes = parseInt(likeCountElement.textContent) || 0;
-            let currentDislikes = parseInt(dislikeCountElement.textContent) || 0;
-
-            console.log("Initial counts:", { currentLikes, currentDislikes });
-
-            // Update counts based on the action
-            if (action === "like") {
-                likeCountElement.textContent = currentLikes + 1;
-
-                // Decrease dislikes count if a dislike was previously active
-                if (dislikeIcon.classList.contains("active")) {
-                    dislikeCountElement.textContent = currentDislikes - 1;
-                }
-
-                // Toggle the active state for like and dislike icons
-                likeIcon.classList.add("active");
-                dislikeIcon.classList.remove("active");
-
-            } else if (action === "dislike") {
-                dislikeCountElement.textContent = currentDislikes + 1;
-
-                // Decrease likes count if a like was previously active
-                if (likeIcon.classList.contains("active")) {
-                    likeCountElement.textContent = currentLikes - 1;
-                }
-
-                // Toggle the active state for like and dislike icons
-                dislikeIcon.classList.add("active");
-                likeIcon.classList.remove("active");
-            }
-
-            console.log(`Successfully switched to ${action} for the reply`);
-            console.log("Updated counts:", {
-                likeCount: likeCountElement.textContent,
-                dislikeCount: dislikeCountElement.textContent
-            });
+            loadThreadDetailsAndReplies(); // Reload to get updated reply counts
         } else {
             console.error("Unexpected server response:", data.message);
         }
@@ -229,7 +172,7 @@ function likeReply(reply_id, action) {
     .catch(error => console.error(`Error ${action}ing reply:`, error));
 }
 
-// render all replies
+// Render all replies
 function renderAllReplies(replies, container = document.getElementById("reply-container"), parentId = null) {
     container.innerHTML = "";
 
@@ -259,7 +202,6 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
                 </span>
                 <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
             </div>
-            ...
         `;
 
         const nestedContainer = document.createElement("div");
