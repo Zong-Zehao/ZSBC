@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #eeeeee;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: white;
+    border-left: 8px solid #e11a27;
+    height: 60px;
+}
+
+.header img{
+    width: 10em;
+}
+
+.header p{
+    margin-right: 1.5em;
+    font-weight:bold;
+    font-size: 1.2em;
+}
+
+/* Styles for the box below the header */
+.navbar {
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow at the bottom */
+    text-align: center;
+    height: 15px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-around;
+    background-color: white;
+}
+
+.navbar p {
+    margin-right:40px;
+}
+
+.container {
+    padding: 20px 40px;
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional shadow for effect */
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 16px; /* Optional for rounded corners */
+    margin-top: 3rem;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+label {
+    display: block;
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 8px;
+    width: 80%;
+    margin-left: 75px;
+    margin-right: auto;
+    font-weight: bold;
+}
+
+.input-field,
+.textarea-field{
+    width: 80%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    margin-left: auto;
+    margin-right: auto; 
+    font-family: monospace;
+}
+
+.category-dropdown{
+    width:83.5%;
+    padding:12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    font-family: monospace;
+
+}
+
+.textarea-field {
+    height: 120px;
+    resize: none;
+}
+
+.submit-btn {
+    display: block;
+    width: 50%;
+    padding: 12px;
+    background-color: #d32f2f;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto;
+    margin-right: auto;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border:2px solid #333;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.submit-btn:hover {
+    background-color: #b71c1c;
+}
