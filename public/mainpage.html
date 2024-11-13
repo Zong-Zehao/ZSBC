@@ -128,27 +128,43 @@
             displayThreads(sortedThreads);
         }
 
-        function displayThreads(threads) {
-            const threadsContainer = document.getElementById("threadsContainer");
-            threadsContainer.innerHTML = '';
-
-            threads.forEach(thread => {
-                const threadElement = document.createElement("div");
-                threadElement.className = "thread";
-
-                threadElement.onclick = () => {
-                    window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
-                };
-
-                threadElement.innerHTML = `
-                    <h3>${thread.title}</h3>
-                    <p>${thread.content}</p>
-                    <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
-                `;
-
-                threadsContainer.appendChild(threadElement);
+        function filterThreads() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const selectedCategory = document.getElementById("categoryFilter").value;
+            const filteredThreads = window.allThreads.filter(thread => {
+                const matchesCategory = selectedCategory ? thread.category === selectedCategory : true;
+                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query);
+                return matchesCategory && matchesSearch;
             });
+            displayThreads(filteredThreads);
         }
+
+        document.getElementById("searchInput").addEventListener("input", filterThreads);
+        document.getElementById("categoryFilter").addEventListener("change", filterThreads);
+
+        function displayThreads(threads) {
+    const threadsContainer = document.getElementById("threadsContainer");
+    threadsContainer.innerHTML = '';
+
+    threads.forEach(thread => {
+        const threadElement = document.createElement("div");
+        threadElement.className = "thread";
+
+        threadElement.onclick = () => {
+            window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+        };
+
+        threadElement.innerHTML = `
+            <h3>${thread.title}</h3>
+            <p class="thread-category">${thread.category}</p>
+            <p>${thread.content}</p>
+            <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
+        `;
+
+        threadsContainer.appendChild(threadElement);
+    });
+}
+
 
         document.getElementById("searchInput").addEventListener("input", function () {
             const query = this.value.toLowerCase();
