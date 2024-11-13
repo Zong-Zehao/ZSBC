@@ -147,6 +147,35 @@ function handleLikeDislikeThread(action) {
         .catch(error => console.error(`Error ${action} thread:`, error));
 }
 
+// Function to handle like or dislike for a reply
+function likeReply(reply_id, action) {
+    const username = localStorage.getItem("username");
+
+    // Prevent multiple likes/dislikes
+    const reply = document.getElementById(`reply-${reply_id}`);
+    const likeIcon = reply.querySelector(".bx-like");
+    const dislikeIcon = reply.querySelector(".bx-dislike");
+
+    if (action === "like" && likeIcon.classList.contains("active")) return;
+    if (action === "dislike" && dislikeIcon.classList.contains("active")) return;
+
+    fetch(`/replies/${reply_id}/likes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message.includes("success")) {
+            loadThreadDetailsAndReplies(); // Refresh thread and replies to update like/dislike counts
+        } else {
+            console.error(data.message);
+        }
+    })
+    .catch(error => console.error(`Error ${action}ing reply:`, error));
+}
+
+// render all replies
 function renderAllReplies(replies, container = document.getElementById("reply-container"), parentId = null) {
     container.innerHTML = "";
 
@@ -159,14 +188,19 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
         const isAdmin = role === "admin";
 
         const replyElement = document.createElement("div");
+        replyElement.id = `reply-${reply.reply_id}`;
         replyElement.classList.add(parentId ? "nested-reply" : "reply");
         replyElement.innerHTML = `
             <h4>${reply.author}</h4>
             <p>${reply.content}</p>
             <small>${new Date(reply.date).toLocaleDateString()}</small>
             <div class="interaction">
-                <span><i class='bx bx-like'></i> ${reply.likes || 0}</span>
-                <span><i class='bx bx-dislike'></i> ${reply.dislikes || 0}</span>
+                <span>
+                    <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> ${reply.likes || 0}
+                </span>
+                <span>
+                    <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> ${reply.dislikes || 0}
+                </span>
                 <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
             </div>
             ${
@@ -180,13 +214,16 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
                     : ""
             }
         `;
+
         const nestedContainer = document.createElement("div");
         nestedContainer.classList.add("nested-reply-container");
         replyElement.appendChild(nestedContainer);
         container.appendChild(replyElement);
+
         renderAllReplies(replies, nestedContainer, reply.reply_id);
     });
 }
+
 // Function to toggle the visibility of the menu 
 function toggleMenu(button) { 
     const menu = button.nextElementSibling; 
