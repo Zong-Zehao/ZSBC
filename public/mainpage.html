@@ -4,20 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./styles/main.css">
     <title>OCBC - Homepage</title>
 </head>
 
 <body>
     <header class="header">
-        <h1>OCBC</h1>
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
         <p>Support forum</p>
     </header>
 
+    <nav class="navbar">
+        <p>Banking for individuals</p>
+        <p>Banking for businesses</p>
+        <p>OCBC Group</p>
+    </nav>
+
+    <div class="image">
+        <div class="text">
+            <p>Empowering you with knowledge and<br>support, because at OCBC, we believe<br> in helping you navigate
+                your financial <br>journey with confidence.</p>
+            <button class="scroll" onclick="document.getElementById('assist').scrollIntoView({ behavior: 'smooth' });">
+                Learn more</button>
+        </div>
+        <img
+            src="https://www.ocbc.com/iwov-resources/sg/ocbc/careers/img/blogs/toppingthechartsatocbc/Jensen_Yeoh_team_photo.jpg"></img>
+    </div>
+
     <article>
         <h1 id="assist">How can we assist you?</h1>
-        <div class="search-container">
+        <div class="search-container" id="search-container">
             <button class="search-btn">
                 <i class='bx bx-search-alt-2'></i>
             </button>
@@ -39,7 +57,6 @@
                 <ul class="dropdown-content" id="dropdownContent">
                     <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
                     <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
-                    <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
                 </ul>
             </div>
             <div class="dropdown-container">
@@ -62,7 +79,6 @@
                 </select>
             </div>
         </div>
-
     </article>
 
     <!-- Show all threads start -->
@@ -74,27 +90,42 @@
     <!-- Show all threads end -->
 
     <script>
-        // Function to update the dropdown button text
+        let currentSort = 'Best'; // Default sort type
+
         function updateDropdown(selection) {
             document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
+            currentSort = selection;
+            sortAndDisplayThreads();
         }
 
-        // Function to load and display threads
         function loadThreads() {
             fetch('/threads', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                window.allThreads = data; // Store all threads globally for filtering
-                displayThreads(data);
-            })
-            .catch(error => {
-                console.error('Error fetching threads:', error);
-            });
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    window.allThreads = data; // Store all threads globally for filtering and sorting
+                    sortAndDisplayThreads(); // Display threads initially
+                })
+                .catch(error => {
+                    console.error('Error fetching threads:', error);
+                });
+        }
+
+        function sortAndDisplayThreads() {
+            let sortedThreads = [...window.allThreads];
+
+            if (currentSort === 'Newest') {
+                sortedThreads.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (currentSort === 'Oldest') {
+                sortedThreads.sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+            // Add other sorting criteria if needed (e.g., 'Best')
+
+            displayThreads(sortedThreads);
         }
 
         function displayThreads(threads) {
@@ -119,26 +150,18 @@
             });
         }
 
-
-        function filterThreads() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
-            const selectedCategory = document.getElementById("categoryFilter").value;
-
-            const filteredThreads = window.allThreads.filter(thread => {
-                const matchesCategory = selectedCategory ? thread.category === selectedCategory : true;
-                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query);
-                return matchesCategory && matchesSearch;
-            });
-
+        document.getElementById("searchInput").addEventListener("input", function () {
+            const query = this.value.toLowerCase();
+            const filteredThreads = window.allThreads.filter(thread =>
+                thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query)
+            );
             displayThreads(filteredThreads);
-        }
-
-        document.getElementById("searchInput").addEventListener("input", filterThreads);
-        document.getElementById("categoryFilter").addEventListener("change", filterThreads);
+        });
 
         // Load threads when the page loads
         window.onload = loadThreads;
     </script>
 
 </body>
+
 </html>

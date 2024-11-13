@@ -4,108 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/index.css">
     <title>Login Page</title>
-    <style>
-        body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #EEEEEE;
-    border-bottom: 4px solid red;
-    height: 45px;
-}
-
-        .center-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: calc(100vh - 60px); 
-            background-color: #f1f1f1;
-        }
-
-        .login-container {
-            background-color: #f9f9f9;
-            padding: 160px;
-            border-radius: 16px; 
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 800px; 
-            text-align: center;
-        }
-
-        .login-container h2 {
-            margin-bottom: 40px;
-            font-size: 48px; 
-            color: #333;
-        }
-
-        .login-container label {
-            display: block;
-            text-align: left;
-            margin-bottom: 10px;
-            color: #333;
-            font-weight: bold;
-            font-size: 24px;
-        }
-
-        .login-container input[type="text"],
-        .login-container input[type="password"] {
-            width: 100%;
-            padding: 20px; 
-            margin-bottom: 40px; 
-            border: 2px solid #ccc;
-            border-radius: 8px; 
-            font-size: 24px; 
-            background-color: #e0e0e0;
-        }
-
-        .login-container input[type="submit"] {
-            width: 25%; 
-            padding: 20px; 
-            background-color: #d32f2f;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 24px; 
-            cursor: pointer;
-            margin: 0 auto;
-            display: block;
-        }
-
-        .login-container input[type="submit"]:hover {
-            background-color: #c62828;
-        }
-
-        .error-message {
-            color: #d32f2f;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 
 <body>
     <header class="header">
-        <h1>OCBC</h1>
-        <p>Support Forum</p>
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
+        <p>Support forum</p>
     </header>
+
+    <nav class="navbar">
+        <p>Banking for individuals</p>
+        <p>Banking for businesses</p>
+        <p>OCBC Group</p>
+    </nav>
 
     <div class="center-wrapper">
         <div class="login-container">
             <form id="loginForm">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <h2>Login</h2> 
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder= "Type your username" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder= "Type your password" required>
 
                 <input type="submit" value="Login">
                 <div id="error" class="error-message"></div>

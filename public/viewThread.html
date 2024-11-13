@@ -1,40 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./styles/viewThread.css">
+
     <title>OCBC - View Thread</title>
     <script src="./scripts/viewThread.js" defer></script>
 </head>
+
 <body>
     <header class="header">
-        <h1>OCBC</h1>
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
         <p>Support forum</p>
     </header>
-<br>
+
+    <nav class="navbar">
+        <p>Banking for individuals</p>
+        <p>Banking for businesses</p>
+        <p>OCBC Group</p>
+    </nav>
+    <br>
 
     <!-- Post Section -->
     <div id="post-container" class="post-container"></div>
 
 
 
-<!-- Reply Section -->
-<div id="reply-container" class="reply-container"></div>
+    <!-- Reply Section -->
+    <div id="reply-container" class="reply-container"></div>
 
-<!-- Replies filter start -->
-<div class="replies-container">
-    <span class="replies-text">Replies</span>
-    <div class="dropdown">
-        <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
-        <ul class="dropdown-content" id="dropdownContent">
-            <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
-            <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
-            <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
-        </ul>
+    <!-- Replies filter start -->
+    <div class="replies-container">
+        <span class="replies-text">Replies</span>
+        <div class="dropdown">
+            <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
+            <ul class="dropdown-content" id="dropdownContent">
+                <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
+                <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
+                <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
+            </ul>
+        </div>
     </div>
-</div>
 
     <!--reply thread filter end-->
 

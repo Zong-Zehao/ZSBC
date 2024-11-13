@@ -4,101 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/createThread.css">
     <title>New Thread</title>
-    <style>
-
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            background-color: #EEEEEE;
-            border-bottom: 4px solid red;
-            height: 45px;
-        }
-
-        .container {
-            width: 100%;
-            padding: 20px 40px;
-        }
-
-        h2 {
-            font-size: 22px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 8px;
-            width: 50%;
-            padding: 12px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .input-field,
-        .textarea-field,
-        .category-dropdown {
-            width: 50%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            background-color: #f9f9f9;
-            font-size: 14px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .category-dropdown{
-            padding:12px;
-            width:53em;
-        }
-
-
-        .textarea-field {
-            height: 120px;
-            resize: none;
-        }
-
-        .submit-btn {
-            display: block;
-            width: 50%;
-            padding: 12px;
-            background-color: #d32f2f;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .submit-btn:hover {
-            background-color: #b71c1c;
-        }
-    </style>
 </head>
 
 <body>
-
     <header class="header">
-        <h1>OCBC</h1>
-        <p>Support Forum</p>
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
+        <p>Support forum</p>
     </header>
+
+    <nav class="navbar">
+        <p>Banking for individuals</p>
+        <p>Banking for businesses</p>
+        <p>OCBC Group</p>
+    </nav>
 
     <div class="container">
         <h2>New Thread</h2>
@@ -152,26 +74,26 @@
                 };
 
                 fetch('/threads', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(threadData),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        document.getElementById("titleInput").value = '';
-                        document.getElementById("questionInput").value = '';
-                        document.getElementById("categoryDropdown").value = 'Accounts';
-                        window.location.href = "/mainpage.html";
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to create thread. Please try again.');
-                });
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(threadData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            alert(data.message);
+                            document.getElementById("titleInput").value = '';
+                            document.getElementById("questionInput").value = '';
+                            document.getElementById("categoryDropdown").value = 'Accounts';
+                            window.location.href = "/mainpage.html";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to create thread. Please try again.');
+                    });
             } else {
                 alert("Please fill out all fields.");
             }
