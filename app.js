@@ -105,7 +105,6 @@ app.delete('/admin/replies/:reply_id', isAdmin, async (req, res) => {
     }
 });
 
-
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });

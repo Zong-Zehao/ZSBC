@@ -184,10 +184,14 @@ function likeReply(reply_id, action) {
 }
 
 // Render all replies
+// Render all replies
 function renderAllReplies(replies, container = document.getElementById("reply-container"), parentId = null) {
     container.innerHTML = "";
 
     const filteredReplies = replies.filter(reply => reply.parent_reply_id === parentId);
+    const username = localStorage.getItem("username"); // Current logged-in user's username
+    const role = localStorage.getItem("role"); // Current logged-in user's role
+    const isAdmin = role === "admin"; // Check if the user is an admin
 
     filteredReplies.forEach(reply => {
         loadUserReputation(reply.author).then(reputation => {
@@ -208,6 +212,12 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
                         <span class="dislike-count">${reply.dislikes || 0}</span>
                     </span>
                     <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
+                    ${
+                        // Show the delete button only for the reply author or admins
+                        (reply.author === username || isAdmin)
+                            ? `<button class="delete-reply-btn" onclick="deleteReply(${reply.reply_id})">Delete</button>`
+                            : ""
+                    }
                 </div>
             `;
             container.appendChild(replyElement);
@@ -215,10 +225,10 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             const nestedContainer = document.createElement("div");
             nestedContainer.classList.add("nested-reply-container");
             replyElement.appendChild(nestedContainer);
-            renderAllReplies(replies, nestedContainer, reply.reply_id);
+            renderAllReplies(replies, nestedContainer, reply.reply_id); // Recursive rendering for nested replies
         });
     });
-}   
+}
 
 // Function to toggle the visibility of the menu 
 function toggleMenu(button) { 
@@ -314,5 +324,7 @@ function addReplyToReply(parent_reply_id, parentReplyElement) {
     .then(() => loadThreadDetailsAndReplies()) 
     .catch(error => console.error('Error adding nested reply:', error)); 
 } 
+
+
 // Load the thread details and replies when the page loads
 window.onload = loadThreadDetailsAndReplies;
