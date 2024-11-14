@@ -35,36 +35,34 @@ function loadThreadDetailsAndReplies() {
         fetch(`/threads/${thread_id}`).then(response => response.json()), // Get thread details
         fetch(`/threads/${thread_id}/replies`).then(response => response.json()) // Get replies
     ])
-        .then(([thread, replyData]) => {
-            const { replies, totalLikes, totalDislikes, userReaction } = replyData;
+    .then(([thread, replyData]) => {
+        const { replies, userReaction } = replyData;
 
+        // Update post object with thread details and total likes/dislikes
+        post = {
+            author: thread.username,
+            title: thread.title,
+            category: thread.category,
+            content: thread.content,
+            date: new Date(thread.date).toLocaleDateString(),
+            likes: thread.total_likes, // Access totalLikes from the thread directly
+            dislikes: thread.total_dislikes, // Access totalDislikes from the thread directly
+            repliesCount: replies.length,
+            replies: replies
+        };
 
-            // Update post object with thread details and total likes/dislikes
-            post = {
-                author: thread.username,
-                title: thread.title,
-                category: thread.category,
-                content: thread.content,
-                date: new Date(thread.date).toLocaleDateString(),
-                likes: totalLikes,
-                dislikes: totalDislikes,
-                repliesCount: replies.length,
-                replies: replies
-            };
+        // Update like/dislike state based on user reaction
+        hasLikedPost = userReaction === "like";
+        hasDislikedPost = userReaction === "dislike";
 
-
-            // Update like/dislike state based on user reaction
-            hasLikedPost = userReaction === "like";
-            hasDislikedPost = userReaction === "dislike";
-
-            // Render post and replies
-            renderPost();
-            renderAllReplies(replies);
-        })
-        .catch(error => {
-            console.error("Error loading thread or replies:", error);
-            document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
-        });
+        // Render post and replies
+        renderPost();
+        renderAllReplies(replies);
+    })
+    .catch(error => {
+        console.error("Error loading thread or replies:", error);
+        document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
+    });
 }
 
 // Render the main post
@@ -139,7 +137,10 @@ function handleLikeDislikeThread(action) {
         .then(response => response.json())
         .then(data => {
             if (data.message === "Thread liked successfully." || data.message === "Thread disliked successfully.") {
-                loadThreadDetailsAndReplies(); // Refresh thread details after action
+                // Update the like and dislike counts without reloading the entire thread
+                post.likes = data.total_likes;
+                post.dislikes = data.total_dislikes;
+                renderPost(); // Re-render the post with updated counts
             } else {
                 console.error(data.message);
             }
@@ -155,14 +156,6 @@ function reloadPage() {
 function likeReply(reply_id, action) {
     const username = localStorage.getItem("username");
 
-    // Prevent multiple likes/dislikes
-    const reply = document.getElementById(`reply-${reply_id}`);
-    const likeIcon = reply.querySelector(".bx-like");
-    const dislikeIcon = reply.querySelector(".bx-dislike");
-
-    if (action === "like" && likeIcon.classList.contains("active")) return;
-    if (action === "dislike" && dislikeIcon.classList.contains("active")) return;
-
     fetch(`/replies/${reply_id}/likes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -170,16 +163,16 @@ function likeReply(reply_id, action) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message.includes("Successfully")) {
-            loadThreadDetailsAndReplies()
+        if (data.message.toLowerCase().includes("success")) {
+            loadThreadDetailsAndReplies(); // Reload to get updated reply counts
         } else {
-            console.error(data.message);
+            console.error("Unexpected server response:", data.message);
         }
     })
     .catch(error => console.error(`Error ${action}ing reply:`, error));
 }
 
-// render all replies
+// Render all replies
 function renderAllReplies(replies, container = document.getElementById("reply-container"), parentId = null) {
     container.innerHTML = "";
 
@@ -200,23 +193,15 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             <small>${new Date(reply.date).toLocaleDateString()}</small>
             <div class="interaction">
                 <span>
-                    <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> ${reply.likes || 0}
+                    <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> 
+                    <span class="like-count">${reply.likes || 0}</span>
                 </span>
                 <span>
-                    <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> ${reply.dislikes || 0}
+                    <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> 
+                    <span class="dislike-count">${reply.dislikes || 0}</span>
                 </span>
                 <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
             </div>
-            ${
-                isAuthor || isAdmin
-                    ? `<div class="menu">
-                           <button class="menu-btn" onclick="toggleMenu(this)">...</button>
-                           <div class="menu-options" style="display:none;">
-                               <button onclick="deleteReply(${reply.reply_id})">Delete Reply</button>
-                           </div>
-                       </div>`
-                    : ""
-            }
         `;
 
         const nestedContainer = document.createElement("div");
