@@ -12,9 +12,14 @@ CREATE TABLE Users (
     reputation INT DEFAULT 0
 );
 
+-- Insert users
 INSERT INTO Users (username, password, role, reputation)
-VALUES ('johndoe', 'password123', 'admin', 100),
-('z', 'z', 'user', 0)
+VALUES 
+('johndoe', 'password123', 'admin', 100),
+('alice', 'alicepass', 'user', 50),
+('z', 'z', 'user', 20),
+('janedoe', 'password456', 'user', 30),
+('charlie', 'charliepass', 'user', 40);
 
 CREATE TABLE Threads ( 
     thread_id INT PRIMARY KEY IDENTITY(1,1),  -- Unique identifier for each thread 
@@ -29,6 +34,22 @@ CREATE TABLE Threads (
     dislikes TEXT,
     FOREIGN KEY (username) REFERENCES Users(username)  -- Reference to the Users table 
 );
+
+INSERT INTO Threads (title, category, content, date, username, total_likes, total_dislikes, likes, dislikes)
+VALUES 
+('Understanding Your Account', 'Accounts', 'Get help managing and understanding your account.', '2024-01-10', 'johndoe', 3, 0, '["alice", "z", "charlie"]', '[]'),
+('Loan Application Tips', 'Loans', 'Learn how to apply for loans effectively.', '2024-02-15', 'alice', 2, 1, '["johndoe", "janedoe"]', '["z"]'),
+('Investment Strategies for Beginners', 'Investments', 'Start your investment journey with these tips.', '2024-03-20', 'z', 1, 0, '["alice"]', '[]'),
+('All About Credit Cards', 'Cards', 'Explore various credit card options.', '2024-04-05', 'janedoe', 4, 0, '["alice", "z", "charlie", "johndoe"]', '[]'),
+('Understanding Insurance Plans', 'Insurance', 'Get help understanding different insurance plans.', '2024-05-10', 'charlie', 3, 1, '["johndoe", "alice", "z"]', '["janedoe"]'),
+('Guide to Digital Banking', 'Digital Banking', 'Learn to use digital banking services.', '2024-06-01', 'johndoe', 2, 0, '["alice", "charlie"]', '[]'),
+('How to Earn Rewards', 'Rewards', 'Discover how to maximize your rewards.', '2024-06-15', 'alice', 3, 0, '["johndoe", "z", "charlie"]', '[]'),
+('Planning for Retirement', 'Retirement', 'Start planning your retirement today.', '2024-07-20', 'z', 2, 1, '["alice", "janedoe"]', '["charlie"]'),
+('Student Support Forum', 'Student Help', 'Get help for students on various topics.', '2024-08-10', 'janedoe', 5, 0, '["alice", "z", "charlie", "johndoe", "janedoe"]', '[]'),
+('Career Guidance', 'Career Help', 'Advice and guidance for your career.', '2024-09-05', 'charlie', 3, 1, '["johndoe", "alice", "z"]', '["janedoe"]'),
+('Connect with the Community', 'Community', 'Engage with fellow community members.', '2024-10-15', 'johndoe', 4, 0, '["alice", "z", "charlie", "janedoe"]', '[]'),
+('Latest News and Updates', 'News', 'Stay up to date with the latest news.', '2024-11-01', 'alice', 2, 1, '["johndoe", "janedoe"]', '["z"]'),
+('General Support and Help', 'General Support', 'Get general help and support for any issue.', '2024-11-10', 'z', 3, 0, '["alice", "charlie", "janedoe"]', '[]');
 
 -- Create Replies table
 CREATE TABLE Replies (

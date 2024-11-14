@@ -95,8 +95,7 @@ article{
     text-align: center;
     display: flex;
     flex-direction: column;
-    align-items:center;
-    
+    align-items:center;    
 }
 
 /* search bar */
@@ -108,6 +107,9 @@ article{
     border-radius: 50px;
     background-color: #f4f4f4;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 2em;
 }
 
 .search-input {
@@ -118,12 +120,6 @@ article{
     font-size: 16px;
     padding-left: 10px;
     font-family: monospace;
-}
-
-.search-container{
-    border: 2px solid #ccc;
-    border-radius: 8px;
-
 }
 
 .search-btn {
@@ -140,11 +136,17 @@ article{
     height: 20px;
 }
 
+.a{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color:#555;
+    opacity: 0.8;
+    margin:0
+}
+
 /*reply button*/
 .reply-container {
     display: flex;
     justify-content: center;
-    margin: 50px;
 }
 
 .reply-btn {
@@ -161,6 +163,7 @@ article{
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
     transition: background-color 0.3s ease; /* Smooth hover effect */
     border:2px solid #333;
+    margin-bottom: 2em;
 }
 
 .reply-btn:hover {
