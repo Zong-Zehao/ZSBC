@@ -15,11 +15,11 @@ CREATE TABLE Users (
 -- Insert users
 INSERT INTO Users (username, password, role, reputation)
 VALUES 
-('johndoe', 'password123', 'admin', 100),
-('alice', 'alicepass', 'user', 50),
-('z', 'z', 'user', 20),
-('janedoe', 'password456', 'user', 30),
-('charlie', 'charliepass', 'user', 40);
+('johndoe', 'password123', 'admin', 9),
+('alice', 'alicepass', 'user', 7),
+('z', 'z', 'user', 6),
+('janedoe', 'password456', 'user', 9),
+('charlie', 'charliepass', 'user', 6);
 
 CREATE TABLE Threads ( 
     thread_id INT PRIMARY KEY IDENTITY(1,1),  -- Unique identifier for each thread 
