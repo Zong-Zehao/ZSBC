@@ -21,6 +21,9 @@ app.use(staticMiddleware);
 // User login route
 app.post("/users/login", userController.login);
 
+// Get reputation for each user
+app.get("/users/:username/reputation", userController.getUserReputation);
+
 // Thread routes
 app.post("/threads", createThread);
 app.get("/threads", getThreads);
