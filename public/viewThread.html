@@ -34,29 +34,4 @@
     <!-- Reply Section -->
     <div id="reply-container" class="reply-container"></div>
 
-    <!-- Replies filter start -->
-    <div class="replies-container">
-        <span class="replies-text">Replies</span>
-        <div class="dropdown">
-            <button class="dropdown-btn" id="dropdownBtn">Best ▼</button>
-            <ul class="dropdown-content" id="dropdownContent">
-                <li><a href="#" onclick="updateDropdown('Best')">Best</a></li>
-                <li><a href="#" onclick="updateDropdown('Newest')">Newest</a></li>
-                <li><a href="#" onclick="updateDropdown('Oldest')">Oldest</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <!--reply thread filter end-->
-
-
-    <!--reply thread filter button start-->
-    <script>
-        // Function to update the dropdown button text
-        function updateDropdown(selection) {
-            document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
-        }
-    </script>
-    <!--reply thread filter button end-->
-
 </body>
