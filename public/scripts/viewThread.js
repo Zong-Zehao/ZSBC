@@ -21,6 +21,17 @@ let post = {
 let hasLikedPost = false;
 let hasDislikedPost = false;
 
+//load user reputation
+function loadUserReputation(username) {
+    return fetch(`/users/${username}/reputation`)
+        .then(response => response.json())
+        .then(data => data.reputation || 0)
+        .catch(error => {
+            console.error(`Error fetching reputation for ${username}:`, error);
+            return 0;
+        });
+}
+
 // Function to load thread details and replies
 function loadThreadDetailsAndReplies() {
     const thread_id = getThreadIdFromURL();
@@ -69,41 +80,41 @@ function loadThreadDetailsAndReplies() {
 function renderPost() {
     const postContainer = document.getElementById("post-container");
     const username = localStorage.getItem("username");
-    const role = localStorage.getItem("role"); // Retrieve the user's role
+    const role = localStorage.getItem("role");
     const isAuthor = username === post.author;
     const isAdmin = role === "admin";
 
-    console.log(`Current User: ${username}, Role: ${role}, Is Admin: ${isAdmin}, Post Author: ${post.author}`);
-
-    postContainer.innerHTML = `
-        <div class="post">
-            <span class="category-label">${post.category}</span> <!-- Category in top right -->
-            <h3>${post.author}</h3>
-            <h2>${post.title}</h2>
-            <p>${post.content}</p>
-            <small>${post.date}</small>
-            <div class="interaction">
-                <span>
-                    <i class='bx bx-like ${hasLikedPost ? "active" : ""}' onclick="handleLikeDislikeThread('like')"></i> ${post.likes}
-                </span>
-                <span>
-                    <i class='bx bx-dislike ${hasDislikedPost ? "active" : ""}' onclick="handleLikeDislikeThread('dislike')"></i> ${post.dislikes}
-                </span>
-                <span><i class='bx bx-chat'></i> ${post.repliesCount}</span>
+    loadUserReputation(post.author).then(reputation => {
+        postContainer.innerHTML = `
+            <div class="post">
+                <span class="category-label">${post.category}</span>
+                <h3>${post.author} <span class="reputation">(${reputation} rep)</span></h3>
+                <h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <small>${post.date}</small>
+                <div class="interaction">
+                    <span>
+                        <i class='bx bx-like ${hasLikedPost ? "active" : ""}' onclick="handleLikeDislikeThread('like')"></i> ${post.likes}
+                    </span>
+                    <span>
+                        <i class='bx bx-dislike ${hasDislikedPost ? "active" : ""}' onclick="handleLikeDislikeThread('dislike')"></i> ${post.dislikes}
+                    </span>
+                    <span><i class='bx bx-chat'></i> ${post.repliesCount}</span>
+                </div>
+                <button class="reply-btn" onclick="addReplyToPost()">Reply</button>
+                ${
+                    isAuthor || isAdmin
+                        ? `<div class="menu">
+                               <button class="menu-btn" onclick="toggleMenu(this)">...</button>
+                               <div class="menu-options" style="display:none;">
+                                   <button onclick="deleteThread()">Delete Thread</button>
+                               </div>
+                           </div>`
+                        : ""
+                }
             </div>
-            <button class="reply-btn" onclick="addReplyToPost()">Reply</button>
-            ${
-                isAuthor || isAdmin
-                    ? `<div class="menu">
-                           <button class="menu-btn" onclick="toggleMenu(this)">...</button>
-                           <div class="menu-options" style="display:none;">
-                               <button onclick="deleteThread()">Delete Thread</button>
-                           </div>
-                       </div>`
-                    : ""
-            }
-        </div>
-    `;
+        `;
+    });
 }
 
 // Function to handle like or dislike for the main post
@@ -179,39 +190,35 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
     const filteredReplies = replies.filter(reply => reply.parent_reply_id === parentId);
 
     filteredReplies.forEach(reply => {
-        const username = localStorage.getItem("username");
-        const role = localStorage.getItem("role");
-        const isAuthor = username === reply.author;
-        const isAdmin = role === "admin";
+        loadUserReputation(reply.author).then(reputation => {
+            const replyElement = document.createElement("div");
+            replyElement.id = `reply-${reply.reply_id}`;
+            replyElement.classList.add(parentId ? "nested-reply" : "reply");
+            replyElement.innerHTML = `
+                <h4>${reply.author} <span class="reputation">(${reputation} rep)</span></h4>
+                <p>${reply.content}</p>
+                <small>${new Date(reply.date).toLocaleDateString()}</small>
+                <div class="interaction">
+                    <span>
+                        <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> 
+                        <span class="like-count">${reply.likes || 0}</span>
+                    </span>
+                    <span>
+                        <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> 
+                        <span class="dislike-count">${reply.dislikes || 0}</span>
+                    </span>
+                    <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
+                </div>
+            `;
+            container.appendChild(replyElement);
 
-        const replyElement = document.createElement("div");
-        replyElement.id = `reply-${reply.reply_id}`;
-        replyElement.classList.add(parentId ? "nested-reply" : "reply");
-        replyElement.innerHTML = `
-            <h4>${reply.author}</h4>
-            <p>${reply.content}</p>
-            <small>${new Date(reply.date).toLocaleDateString()}</small>
-            <div class="interaction">
-                <span>
-                    <i class='bx bx-like' onclick="likeReply(${reply.reply_id}, 'like')"></i> 
-                    <span class="like-count">${reply.likes || 0}</span>
-                </span>
-                <span>
-                    <i class='bx bx-dislike' onclick="likeReply(${reply.reply_id}, 'dislike')"></i> 
-                    <span class="dislike-count">${reply.dislikes || 0}</span>
-                </span>
-                <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
-            </div>
-        `;
-
-        const nestedContainer = document.createElement("div");
-        nestedContainer.classList.add("nested-reply-container");
-        replyElement.appendChild(nestedContainer);
-        container.appendChild(replyElement);
-
-        renderAllReplies(replies, nestedContainer, reply.reply_id);
+            const nestedContainer = document.createElement("div");
+            nestedContainer.classList.add("nested-reply-container");
+            replyElement.appendChild(nestedContainer);
+            renderAllReplies(replies, nestedContainer, reply.reply_id);
+        });
     });
-}
+}   
 
 // Function to toggle the visibility of the menu 
 function toggleMenu(button) { 
