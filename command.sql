@@ -12,9 +12,14 @@ CREATE TABLE Users (
     reputation INT DEFAULT 0
 );
 
+-- Insert users
 INSERT INTO Users (username, password, role, reputation)
-VALUES ('johndoe', 'password123', 'admin', 100),
-('z', 'z', 'user', 0)
+VALUES 
+('johndoe', 'password123', 'admin', 100),
+('alice', 'alicepass', 'user', 50),
+('z', 'z', 'user', 20),
+('janedoe', 'password456', 'user', 30),
+('charlie', 'charliepass', 'user', 40);
 
 CREATE TABLE Threads ( 
     thread_id INT PRIMARY KEY IDENTITY(1,1),  -- Unique identifier for each thread 
@@ -29,6 +34,14 @@ CREATE TABLE Threads (
     dislikes TEXT,
     FOREIGN KEY (username) REFERENCES Users(username)  -- Reference to the Users table 
 );
+
+INSERT INTO Threads (title, category, content, date, username, total_likes, total_dislikes, likes, dislikes)
+VALUES 
+('Welcome to the forum', 'Introduction', 'This is an introduction post.', '2024-01-10', 'johndoe', 3, 0, '["alice", "z", "charlie"]', '[]'),
+('General Discussion', 'General', 'Lets talk about general topics here.', '2024-02-15', 'alice', 2, 1, '["johndoe", "janedoe"]', '["z"]'),
+('Help Needed', 'Support', 'I need help with my account.', '2024-03-20', 'z', 1, 0, '["alice"]', '[]'),
+('Forum Rules', 'Rules', 'Please read the forum rules before posting.', '2024-04-05', 'janedoe', 4, 0, '["alice", "z", "charlie", "johndoe"]', '[]'),
+('Tech Talk', 'Technology', 'Discuss the latest in technology!', '2024-05-10', 'charlie', 3, 1, '["johndoe", "alice", "z"]', '["janedoe"]');
 
 -- Create Replies table
 CREATE TABLE Replies (
