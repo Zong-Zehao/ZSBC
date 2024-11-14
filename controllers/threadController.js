@@ -28,7 +28,7 @@ async function createThread(req, res) {
     }
 }
 
-// Delete a thread
+// Combined function to delete a thread along with all its replies (including nested replies) and reactions
 async function deleteThread(req, res) {
     const { thread_id } = req.params;
     const { username } = req.body;
@@ -72,12 +72,56 @@ async function deleteThread(req, res) {
             return res.status(403).json({ message: "You can only delete your own threads" });
         }
 
-        // Delete replies associated with the thread
-        await pool.request()
-            .input("thread_id", sql.Int, thread_id)
-            .query("DELETE FROM Replies WHERE thread_id = @thread_id");
+        // Recursive function to delete replies, nested replies, and reactions
+        const deleteRepliesAndReactions = async (thread_id) => {
+            // Delete reactions for the replies
+            await pool.request()
+                .input("thread_id", sql.Int, thread_id)
+                .query("DELETE FROM ReplyReactions WHERE reply_id IN (SELECT reply_id FROM Replies WHERE thread_id = @thread_id)");
 
-        // Delete the thread
+            // Delete the replies (including nested replies)
+            const repliesResult = await pool.request()
+                .input("thread_id", sql.Int, thread_id)
+                .query("SELECT reply_id FROM Replies WHERE thread_id = @thread_id");
+
+            for (let reply of repliesResult.recordset) {
+                // Recursively delete nested replies and reactions
+                await deleteNestedRepliesAndReactions(reply.reply_id);
+            }
+
+            // Delete the replies themselves
+            await pool.request()
+                .input("thread_id", sql.Int, thread_id)
+                .query("DELETE FROM Replies WHERE thread_id = @thread_id");
+        };
+
+        // Recursive function to delete nested replies and reactions
+        const deleteNestedRepliesAndReactions = async (reply_id) => {
+            // Delete reactions for the reply
+            await pool.request()
+                .input("reply_id", sql.Int, reply_id)
+                .query("DELETE FROM ReplyReactions WHERE reply_id = @reply_id");
+
+            // Get nested replies for the current reply
+            const nestedRepliesResult = await pool.request()
+                .input("reply_id", sql.Int, reply_id)
+                .query("SELECT reply_id FROM Replies WHERE parent_reply_id = @reply_id");
+
+            for (let nestedReply of nestedRepliesResult.recordset) {
+                // Recursively delete nested replies and their reactions
+                await deleteNestedRepliesAndReactions(nestedReply.reply_id);
+            }
+
+            // Finally delete the nested replies
+            await pool.request()
+                .input("reply_id", sql.Int, reply_id)
+                .query("DELETE FROM Replies WHERE reply_id = @reply_id");
+        };
+
+        // Delete replies and nested replies along with reactions
+        await deleteRepliesAndReactions(thread_id);
+
+        // Delete the thread itself
         await pool.request()
             .input("thread_id", sql.Int, thread_id)
             .query("DELETE FROM Threads WHERE thread_id = @thread_id");
