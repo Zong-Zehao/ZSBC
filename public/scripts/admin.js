@@ -8,12 +8,9 @@ function loadThreadsForAdmin() {
     }
 
     fetch('/admin/threads', {
-        headers: {
-            username // Pass username for admin validation
-        }
+        headers: { username } // Pass username for admin validation
     })
     .then(response => {
-        console.log("Response status:", response.status);
         if (response.status === 403) {
             throw new Error("Access denied. You are not an admin.");
         }
@@ -22,11 +19,6 @@ function loadThreadsForAdmin() {
     .then(threads => {
         const container = document.getElementById('threads-container');
         container.innerHTML = "";
-
-        if (!Array.isArray(threads)) {
-            console.error("Invalid data received for threads:", threads);
-            return;
-        }
 
         threads.forEach(thread => {
             const threadElement = document.createElement('div');
@@ -62,7 +54,7 @@ function deleteThread(thread_id) {
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            loadThreadsForAdmin(); // Reload threads after deletion
+            location.reload(); // Reload the page after thread is deleted
         })
         .catch(error => console.error('Error deleting thread:', error));
     }
@@ -113,11 +105,7 @@ function deleteReply(reply_id) {
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            // Reload replies for the current thread
-            const currentThreadId = getCurrentThreadId();
-            if (currentThreadId) {
-                loadRepliesForAdmin(currentThreadId);
-            }
+            location.reload(); // Reload the page after reply is deleted
         })
         .catch(error => console.error('Error deleting reply:', error));
     }
@@ -134,3 +122,4 @@ function getCurrentThreadId() {
 window.onload = () => {
     loadThreadsForAdmin();
 };
+

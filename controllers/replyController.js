@@ -51,7 +51,7 @@ async function addReply(req, res) {
     }
 }
 
-// Delete a reply
+// delete reply
 async function deleteReply(req, res) {
     const { reply_id } = req.params;
     const { username } = req.body;
@@ -83,15 +83,45 @@ async function deleteReply(req, res) {
 
         // Allow deletion if admin or reply owner
         if (reply.author !== username && !isAdmin) {
-            return res.status(403).json({ message: "You can only delete your own replies" });
+            return res.status(403).json({ message: "You can only delete your own replies or if you are an admin" });
         }
 
-        // Delete the reply
+        // Recursive function to delete nested replies
+        async function deleteNestedReplies(replyId) {
+            // Find all child replies
+            const childReplies = await pool.request()
+                .input("parent_reply_id", sql.Int, replyId)
+                .query("SELECT reply_id FROM Replies WHERE parent_reply_id = @parent_reply_id");
+
+            for (const childReply of childReplies.recordset) {
+                await deleteNestedReplies(childReply.reply_id); // Recursively delete child replies
+
+                // Delete reactions for the child reply
+                await pool.request()
+                    .input("reply_id", sql.Int, childReply.reply_id)
+                    .query("DELETE FROM ReplyReactions WHERE reply_id = @reply_id");
+                
+                // Delete the child reply itself
+                await pool.request()
+                    .input("reply_id", sql.Int, childReply.reply_id)
+                    .query("DELETE FROM Replies WHERE reply_id = @reply_id");
+            }
+        }
+
+        // Delete nested replies for the main reply
+        await deleteNestedReplies(reply_id);
+
+        // Delete reactions for the main reply
+        await pool.request()
+            .input("reply_id", sql.Int, reply_id)
+            .query("DELETE FROM ReplyReactions WHERE reply_id = @reply_id");
+
+        // Finally, delete the main reply
         await pool.request()
             .input("reply_id", sql.Int, reply_id)
             .query("DELETE FROM Replies WHERE reply_id = @reply_id");
 
-        res.status(200).json({ message: "Reply deleted successfully" });
+        res.status(200).json({ message: "Reply and nested replies deleted successfully" });
     } catch (error) {
         console.error("Error deleting reply:", error);
         res.status(500).json({ message: "Failed to delete reply" });
