@@ -39,15 +39,20 @@
             <button class="search-btn">
                 <i class='bx bx-search-alt-2'></i>
             </button>
-            <input type="text" placeholder="Ask a question" class="search-input" id="searchInput">
+            <input type="text" placeholder="Search Threads" class="search-input" id="searchInput">
         </div>
+
+        <div class=a>
+            <p>Not finding what you're looking for? Create a thread!</p>
+        </div>
+
         <div class="reply-container">
             <a href="createthread.html" class="reply-btn">New Thread +</a>
         </div>
 
         <div class="replies-container">
             <span class="replies-text">Threads</span>
-            
+
             <!-- Category filter dropdown -->
 
 
@@ -62,23 +67,23 @@
             <div class="dropdown-container">
                 <div class="dropdown">
                     <select id="categoryFilter" class="category-filter">
-                    <option value="">All Categories</option>
-                    <option value="Accounts">Accounts</option>
-                    <option value="Loans">Loans</option>
-                    <option value="Investments">Investments</option>
-                    <option value="Cards">Cards</option>
-                    <option value="Insurance">Insurance</option>
-                    <option value="Digital Banking">Digital Banking</option>
-                    <option value="Rewards">Rewards</option>
-                    <option value="Retirement">Retirement</option>
-                    <option value="Student Help">Student Help</option>
-                    <option value="Career Help">Career Help</option>
-                    <option value="Community">Community</option>
-                    <option value="News">News</option>
-                    <option value="General Support">General Support</option>
-                </select>
+                        <option value="">All Categories</option>
+                        <option value="Accounts">Accounts</option>
+                        <option value="Loans">Loans</option>
+                        <option value="Investments">Investments</option>
+                        <option value="Cards">Cards</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Digital Banking">Digital Banking</option>
+                        <option value="Rewards">Rewards</option>
+                        <option value="Retirement">Retirement</option>
+                        <option value="Student Help">Student Help</option>
+                        <option value="Career Help">Career Help</option>
+                        <option value="Community">Community</option>
+                        <option value="News">News</option>
+                        <option value="General Support">General Support</option>
+                    </select>
+                </div>
             </div>
-        </div>
     </article>
 
     <!-- Show all threads start -->
@@ -120,10 +125,10 @@
 
             if (currentSort === 'Newest') {
                 sortedThreads.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (currentSort === 'Oldest') {
-                sortedThreads.sort((a, b) => new Date(a.date) - new Date(b.date));
+            } else if (currentSort === 'Best') {
+                // Sort by total_likes in descending order
+                sortedThreads.sort((a, b) => b.total_likes - a.total_likes);
             }
-            // Add other sorting criteria if needed (e.g., 'Best')
 
             displayThreads(sortedThreads);
         }
@@ -133,7 +138,8 @@
             const selectedCategory = document.getElementById("categoryFilter").value;
             const filteredThreads = window.allThreads.filter(thread => {
                 const matchesCategory = selectedCategory ? thread.category === selectedCategory : true;
-                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query);
+                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase()
+                    .includes(query);
                 return matchesCategory && matchesSearch;
             });
             displayThreads(filteredThreads);
@@ -143,27 +149,27 @@
         document.getElementById("categoryFilter").addEventListener("change", filterThreads);
 
         function displayThreads(threads) {
-    const threadsContainer = document.getElementById("threadsContainer");
-    threadsContainer.innerHTML = '';
+            const threadsContainer = document.getElementById("threadsContainer");
+            threadsContainer.innerHTML = '';
 
-    threads.forEach(thread => {
-        const threadElement = document.createElement("div");
-        threadElement.className = "thread";
+            threads.forEach(thread => {
+                const threadElement = document.createElement("div");
+                threadElement.className = "thread";
 
-        threadElement.onclick = () => {
-            window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
-        };
+                threadElement.onclick = () => {
+                    window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+                };
 
-        threadElement.innerHTML = `
+                threadElement.innerHTML = `
             <h3>${thread.title}</h3>
             <p class="thread-category">${thread.category}</p>
             <p>${thread.content}</p>
             <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
         `;
 
-        threadsContainer.appendChild(threadElement);
-    });
-}
+                threadsContainer.appendChild(threadElement);
+            });
+        }
 
 
         document.getElementById("searchInput").addEventListener("input", function () {
