@@ -1,32 +1,47 @@
 const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
+// Define the function to detect sensitive data
+const sensitivePatterns = [
+  /\b\d{8}\b/, // Phone numbers
+  /\b(?:\d{4}-){3}\d{4}|\d{16}\b/, // Credit card numbers
+  /\b\d{4}\b/ // PIN numbers
+];
+
+function containsSensitiveData(content) {
+  return sensitivePatterns.some((pattern) => pattern.test(content));
+}
+
 // Create a new thread
 async function createThread(req, res) {
-    const { title, content, username, category } = req.body;
+  const { title, content, username, category } = req.body;
 
-    if (!title || !content || !username || !category) {
-        return res.status(400).json({ message: "Missing required fields" });
-    }
+  if (!title || !content || !username || !category) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
 
-    try {
-        const pool = await sql.connect(dbConfig);
-        await pool
-            .request()
-            .input("title", sql.VarChar, title)
-            .input("content", sql.Text, content)
-            .input("username", sql.VarChar, username)
-            .input("category", sql.VarChar, category)  // New input for category
-            .query(
-                "INSERT INTO Threads (title, content, username, category) VALUES (@title, @content, @username, @category)"
-            );
+  if (containsSensitiveData(content)) {
+    return res.status(400).json({
+      message: "Thread contains either a phone number or sensitive banking information. Please remove it before posting.",
+    });
+  }
 
-        res.status(201).json({ message: "Thread created successfully!" });
-    } catch (error) {
-        console.error("Error creating thread:", error);
-        res.status(500).json({ message: "Failed to create thread" });
-    }
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("title", sql.VarChar, title)
+      .input("content", sql.Text, content)
+      .input("username", sql.VarChar, username)
+      .input("category", sql.VarChar, category)
+      .query("INSERT INTO Threads (title, content, username, category) VALUES (@title, @content, @username, @category)");
+
+    res.status(201).json({ message: "Thread created successfully!" });
+  } catch (error) {
+    console.error("Error creating thread:", error.message, { stack: error.stack });
+    res.status(500).json({ message: "Internal server error. Please try again later." });
+  }
 }
+  
 
 // Combined function to delete a thread along with all its replies (including nested replies) and reactions
 async function deleteThread(req, res) {
