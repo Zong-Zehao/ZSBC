@@ -17,6 +17,12 @@
 
     <nav>
         <h1>Admin Panel</h1>
+        <div class="filter-dropdown">
+            <select id="filter-select" onchange="filterThreads(this.value)">
+                <option value="newest">Newest</option>
+                <option value="best">Best</option>
+            </select>
+        </div>
     </nav>
 
     <main>

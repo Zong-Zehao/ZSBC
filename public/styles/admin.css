@@ -47,6 +47,51 @@ nav p {
     font-size: 1.2rem;
 }
 
+nav .filter-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+nav .filter-buttons button {
+    background-color: #e11a27;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 1rem;
+}
+
+nav .filter-buttons button:last-child {
+    margin-right: 0;
+}
+
+nav .filter-buttons button:hover {
+    background-color: #c0001a;
+}
+
+.filter-dropdown {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.filter-dropdown select {
+    background-color: #e11a27;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-dropdown select:hover {
+    background-color: #c0001a;
+}
+
 main {
     padding: 2rem;
     max-width: 1200px;
@@ -93,7 +138,6 @@ footer {
     font-size: 1rem;
     font-weight: bold;
 }
-
 .thread {
     border: 1px solid #ccc;
     padding: 1rem;
@@ -109,8 +153,26 @@ footer {
     display: inline-block;
 }
 
+.thread .meta-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.thread .category-label {
+    background-color: #131414; 
+    color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 30px; 
+    font-size: 16px; 
+    font-weight: bold;
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin-right: 1rem;
+}
+
 .thread .meta {
-    float: right;
     font-size: 1rem;
     color: #666;
 }
@@ -139,7 +201,7 @@ footer {
     background-color: #e11a27;
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 0.6rem; /* Decrease button size */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -156,8 +218,87 @@ footer {
 
 .thread .date {
     position: absolute;
-    bottom: 1rem;
-    right: 1rem;
+    top: 10px;
+    right: 10px;
     font-size: 0.875rem;
     color: #666;
+}
+
+.thread .replies-container {
+    margin-top: 1rem; /* Add margin to ensure it doesn't touch the buttons */
+}
+
+.reply {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    position: relative;
+    margin-left: 2rem; /* Indent replies */
+}
+
+.reply .name {
+    font-size: 1.2rem; /* Smaller than the title */
+    font-weight: bold;
+    margin: 0;
+    display: inline-block;
+}
+
+.reply .meta-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.reply .meta {
+    font-size: 1rem;
+    color: #666;
+}
+
+.reply p {
+    margin: 0.5rem 0;
+}
+
+.reply small {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.reply .buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.reply .buttons button {
+    background-color: #e11a27;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem; /* Decrease button size */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 1rem;
+}
+
+.reply .buttons button:last-child {
+    margin-right: 0;
+}
+
+.reply .buttons button:hover {
+    background-color: #c0001a;
+}
+
+.reply .date {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.transition {
+    background-color: 0.3s;
+    margin-right: 1rem;
 }
