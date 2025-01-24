@@ -24,10 +24,18 @@
 
     <div class="image">
         <div class="text">
-            <p>Empowering you with knowledge and<br>support, because at OCBC, we believe<br> in helping you navigate
-                your financial <br>journey with confidence.</p>
-            <button class="scroll" onclick="document.getElementById('assist').scrollIntoView({ behavior: 'smooth' });">
-                Learn more</button>
+            <p>
+                Empowering you with knowledge and<br>support, because at OCBC, we believe<br> in helping you navigate
+                your financial <br>journey with confidence.
+            </p>
+            <div class="scroll-container">
+                <button class="scroll" onclick="document.getElementById('assist').scrollIntoView({ behavior: 'smooth' });">
+                    Learn more
+                </button>
+                <button class="scroll">
+                    Consult a Professional
+                </button>
+            </div>
         </div>
         <img
             src="https://www.ocbc.com/iwov-resources/sg/ocbc/careers/img/blogs/toppingthechartsatocbc/Jensen_Yeoh_team_photo.jpg"></img>
@@ -41,6 +49,16 @@
             </button>
             <input type="text" placeholder="Search Threads" class="search-input" id="searchInput">
         </div>
+
+        <!-- leaderboard start -->
+        <div class="leaderboard-container">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboard">
+                <!-- Leaderboard items will be dynamically added here -->
+            </ul>
+        </div>
+        <!-- leaderboard end -->
+
 
         <div class=a>
             <p>Not finding what you're looking for? Create a thread!</p>
@@ -180,8 +198,53 @@
             displayThreads(filteredThreads);
         });
 
-        // Load threads when the page loads
-        window.onload = loadThreads;
+        // leaderboard start 
+        // Fetch leaderboard data and populate the leaderboard
+        function loadLeaderboard() {
+            fetch('/leaderboard', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch leaderboard');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        displayLeaderboard(data.data);
+                    } else {
+                        console.error('Failed to load leaderboard:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching leaderboard:', error);
+                });
+        }
+
+        // Populate the leaderboard list
+        function displayLeaderboard(leaderboard) {
+            const leaderboardContainer = document.getElementById('leaderboard');
+            leaderboardContainer.innerHTML = ''; // Clear existing items
+
+            leaderboard.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <strong>${user.username}</strong>  Reputation: ${user.reputation}
+                `;
+                leaderboardContainer.appendChild(listItem);
+            });
+        }
+        // leaderboard end 
+
+        window.onload = function () {
+            loadThreads();
+            loadLeaderboard();
+        };
+
     </script>
 
 </body>
