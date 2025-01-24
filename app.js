@@ -10,6 +10,7 @@ const { createThread, deleteThread } = require("./controllers/threadController")
 const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller');
 const isAdmin = require("./controllers/authMiddleware");
 const { getRepliesByThreadId, addReply, deleteReply, likeReply, likeThread, dislikeThread} = require("./controllers/replyController");
+const LeaderboardController = require('./controllers/leaderboardcontroller');
 
 
 const staticMiddleware = express.static("public");
@@ -39,6 +40,9 @@ app.get("/threads/:thread_id/replies", getRepliesByThreadId);
 app.post("/threads/:thread_id/replies", addReply);
 app.delete("/replies/:reply_id", deleteReply);
 app.post("/replies/:reply_id/likes", likeReply);
+
+// get username and reputation for leaderboard
+app.get('/leaderboard', LeaderboardController.getLeaderboard);
 
 // Admin-only routes
 app.get('/admin/threads', isAdmin, async (req, res) => {
