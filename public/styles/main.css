@@ -63,8 +63,10 @@ body {
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
-.text{
+.text {
+    display: flex;
     flex-direction: column;
+    align-items: flex-start; /* Aligns buttons and text to the left */
 }
 
 .scroll{
@@ -79,6 +81,12 @@ body {
     font-weight: bold;
     font-size: 20px;
     cursor: pointer; /* Changes the mouse pointer to a click hand icon */
+}
+
+.scroll-container {
+    display: flex;
+    gap: 1em; /* Add consistent spacing between buttons */
+    margin-top: 20px;
 }
 
 .scroll:hover {
@@ -142,6 +150,81 @@ article{
     opacity: 0.8;
     margin:0
 }
+
+/* leaderboard start */
+/* leaderboard container */
+.leaderboard-container {
+    position: absolute;
+    top: 680px; /* Adjust based on your layout */
+    right: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    max-width: 320px;
+    width: 100%;
+}
+
+/* leaderboard title */
+.leaderboard-container h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* leaderboard list */
+#leaderboard {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+/* leaderboard list items */
+#leaderboard li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 12px 0;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+/* leaderboard user name */
+#leaderboard li strong {
+    font-size: 16px;
+    color: #333;
+}
+
+/* leaderboard user reputation */
+#leaderboard li span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d00000;
+}
+
+/* hover effect on leaderboard items */
+#leaderboard li:hover {
+    background-color: #e6f7ff;
+    cursor: pointer;
+}
+
+/* make the reputation standout */
+#leaderboard li span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d00000; /* Red for high visibility */
+    background-color: #fff3f3;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+/* leaderboard end */
+
 
 /*reply button*/
 .reply-container {

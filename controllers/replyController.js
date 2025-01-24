@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
+const ReplyModel = require('../models/replyModel');
 
 // Get replies by thread_id, including nested replies
 async function getRepliesByThreadId(req, res) {
@@ -33,6 +34,22 @@ async function getRepliesByThreadId(req, res) {
 async function addReply(req, res) {
     const { thread_id, author, content, parent_reply_id } = req.body;
 
+    const sensitivePatterns = [
+        /\b\d{8}\b/, // Phone numbers
+        /\b(?:\d{4}-){3}\d{4}|\d{16}\b/, // Credit card numbers
+        /\b\d{4}\b/ // PIN numbers
+    ];
+
+    function containsSensitiveData(content) {
+        return sensitivePatterns.some((pattern) => pattern.test(content));
+    }
+
+    if (containsSensitiveData(content)) {
+        return res.status(400).json({ 
+            message: "Reply contains either a phone number or sensitive banking information. Please remove it before posting." 
+        });
+    }
+
     try {
         const pool = await sql.connect(dbConfig);
         const result = await pool.request()
@@ -40,9 +57,11 @@ async function addReply(req, res) {
             .input('author', sql.VarChar, author)
             .input('content', sql.Text, content)
             .input('parent_reply_id', sql.Int, parent_reply_id || null)
-            .query(`INSERT INTO Replies (thread_id, author, content, parent_reply_id, date)
-                    OUTPUT INSERTED.reply_id, INSERTED.author, INSERTED.content, INSERTED.date, INSERTED.parent_reply_id
-                    VALUES (@thread_id, @author, @content, @parent_reply_id, GETDATE())`);
+            .query(`
+                INSERT INTO Replies (thread_id, author, content, parent_reply_id, date)
+                OUTPUT INSERTED.reply_id, INSERTED.author, INSERTED.content, INSERTED.date, INSERTED.parent_reply_id
+                VALUES (@thread_id, @author, @content, @parent_reply_id, GETDATE())
+            `);
 
         res.status(201).json(result.recordset[0]);
     } catch (error) {
