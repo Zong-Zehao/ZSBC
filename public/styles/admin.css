@@ -146,18 +146,22 @@ footer {
     position: relative;
 }
 
+.thread .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
 .thread .name {
     font-size: 1.2rem; /* Smaller than the title */
     font-weight: bold;
     margin: 0;
-    display: inline-block;
 }
 
 .thread .meta-container {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    margin-top: 0.5rem;
 }
 
 .thread .category-label {
