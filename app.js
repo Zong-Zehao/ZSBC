@@ -4,9 +4,13 @@ const sql = require("mssql");
 const dbConfig = require("./dbConfig");
 const app = express();
 const port = 3000;
+const path = require("path");
+const server = require("http").createServer(app);
+
+const io = require("socket.io")(server);
+
 const userController = require("./controllers/userController");
 const { createThread, deleteThread } = require("./controllers/threadController"); // Import corrected controller
-
 const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller');
 const isAdmin = require("./controllers/authMiddleware");
 const { getRepliesByThreadId, addReply, deleteReply, likeReply, likeThread, dislikeThread} = require("./controllers/replyController");
@@ -19,6 +23,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(staticMiddleware);
 app.use(express.json());
+app.use(express.static(path.join(__dirname+"/public")));
+
+io.on("connection", function(socket){
+    socket.on("newuser", function(username){
+        socket.broadcast.emit("update", username + " joined the conversation");
+    });
+    socket.on("exituser", function(username){
+        socket.broadcast.emit("update", username + " left the conversation");
+    });
+    socket.on("chat", function(message){
+        socket.broadcast.emit("chat", message);
+    });
+});
+
 
 
 // User login route
@@ -133,6 +151,6 @@ app.delete('/admin/replies/:reply_id', isAdmin, async (req, res) => {
     }
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
