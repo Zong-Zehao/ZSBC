@@ -4,31 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/admin.css"> <!-- Optional CSS for styling -->
-    <script defer src="scripts/admin.js"></script>
+    <script  src="scripts/admin.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Admin Panel</h1>
-        <p>Welcome, Admin!</p>
+    <header class="header">
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
+        <p>Admin Panel</p>
     </header>
+
+    <nav>
+        <h1>Admin Panel</h1>
+        <div class="filter-dropdown">
+            <select id="filter-select" onchange="filterThreads(this.value)">
+                <option value="Best">Best</option>
+                <option value="Newest">Newest</option>
+            </select>
+        </div>
+    </nav>
 
     <main>
         <section id="threads-container">
             <h2>Manage Threads</h2>
             <div id="threads-list">
-                <!-- Threads will be dynamically loaded here -->
-            </div>
-        </section>
-        <section>
-            <div id="replies-container">
-                <!-- Replies will be dynamically loaded here -->
+                <!-- Example of a thread with replies -->
+                <div class="thread">
+                    <p>Thread content here...</p>
+                    <div class="replies-container">
+                        
+                        <!-- Replies will be dynamically loaded here -->
+                    </div>
+                </div>
+                <!-- Repeat for other threads -->
             </div>
         </section>
     </main>
-
-    <footer>
-        <p>Admin Panel </p>
-    </footer>
 </body>
 </html>
