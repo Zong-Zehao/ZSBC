@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/admin.css"> <!-- Optional CSS for styling -->
-    <script defer src="scripts/admin.js"></script>
+    <script  src="scripts/admin.js"></script>
 </head>
 <body>
     <header class="header">
@@ -19,8 +20,8 @@
         <h1>Admin Panel</h1>
         <div class="filter-dropdown">
             <select id="filter-select" onchange="filterThreads(this.value)">
-                <option value="newest">Newest</option>
-                <option value="best">Best</option>
+                <option value="Best">Best</option>
+                <option value="Newest">Newest</option>
             </select>
         </div>
     </nav>
@@ -33,6 +34,7 @@
                 <div class="thread">
                     <p>Thread content here...</p>
                     <div class="replies-container">
+                        
                         <!-- Replies will be dynamically loaded here -->
                     </div>
                 </div>
