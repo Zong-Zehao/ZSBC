@@ -25,7 +25,11 @@ async function login(req, res) {
       const token = jwt.sign(payload, process.env.secretKey, { expiresIn: "1h" });
 
       console.log("Login successful for username:", username);
-      res.json({ message: "Login successful!", token, redirect: "/mainpage.html" }); // Include redirect URL
+      
+      // Redirect Admins to `admin.html`, and regular users to `mainpage.html`
+      const redirectUrl = user.role === "admin" ? "/admin.html" : "/mainpage.html";
+
+      res.json({ message: "Login successful!", token, redirect: redirectUrl });
     } else {
       console.log("Password does not match for username:", username);
       res.status(401).send("Invalid username or password");
