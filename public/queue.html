@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/queue.css">
+    <title>Schedule Live Chat</title>
+</head>
+
+<body>
+    <header class="header">
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
+        <p>Support Forum</p>
+    </header>
+
+    <nav class="navbar">
+        <p>Banking for individuals</p>
+        <p>Banking for businesses</p>
+        <p>OCBC Group</p>
+    </nav>
+
+    <main class="container">
+        <h2>Schedule a Live Chat</h2>
+        <!-- Back Button -->
+        <a href="mainpage.html" class="back-button">← Back</a>
+        <p>
+            Please select the reason for your live chat request:
+            <span class="required-asterisk">*</span>
+        </p>
+
+        <form id="chatForm">
+            <label>
+                <input type="radio" name="chat_reason" value="Account Issues" required>
+                Account Issues
+            </label><br>
+
+            <label>
+                <input type="radio" name="chat_reason" value="Transaction Problems">
+                Transaction Problems
+            </label><br>
+
+            <label>
+                <input type="radio" name="chat_reason" value="Card Services">
+                Card Services
+            </label><br>
+
+            <label>
+                <input type="radio" name="chat_reason" value="Loan and Mortgage">
+                Loan and Mortgage
+            </label><br>
+
+            <div class="other-option">
+                <label>
+                    <input type="radio" name="chat_reason" value="Other" id="otherRadio">
+                    Other (please specify)
+                </label>
+                <textarea name="other_details" id="otherDetails" placeholder="Provide more details..." rows="4" disabled></textarea>
+            </div><br>
+
+            <label>
+                Explain
+                <span class="required-asterisk">*</span>
+            </label>
+            <textarea name="additional_details" placeholder="Explain your issue as best as you can..." rows="4" required></textarea><br>
+
+            <button type="submit">Submit Request</button>
+        </form>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Chat Request Sent Successfully!</h2>
+            <p>Your request has been successfully submitted. You will be redirected shortly.</p>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to handle "Other" option behavior
+        const otherRadio = document.getElementById('otherRadio');
+        const otherDetails = document.getElementById('otherDetails');
+
+        document.querySelectorAll('input[name="chat_reason"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (otherRadio.checked) {
+                    otherDetails.disabled = false;
+                    otherDetails.required = true;
+                } else {
+                    otherDetails.disabled = true;
+                    otherDetails.required = false;
+                    otherDetails.value = '';
+                }
+            });
+        });
+
+        // Handle form submission with redirection and modal display
+        const chatForm = document.getElementById('chatForm');
+        const successModal = document.getElementById('successModal');
+        const closeModal = successModal.querySelector('.close');
+
+        // Retrieve the username from localStorage
+        const username = localStorage.getItem('username');  // Adjust as needed
+
+        chatForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(chatForm);
+            const chatRequestData = {
+                username: username,  // Add the username here
+                chat_reason: formData.get('chat_reason'),
+                other_details: formData.get('other_details'),
+                additional_details: formData.get('additional_details'),
+            };
+        
+            try {
+                const response = await fetch('/submit_chat_request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(chatRequestData),
+                });
+            
+                const data = await response.json();
+            
+                if (response.ok) {
+                    // Show success modal and then redirect
+                    successModal.style.display = 'block';
+                    setTimeout(function() {
+                        const newTab = window.open('waitingroom.html', '_blank');
+                        newTab.onload = function() {
+                            window.location.href = 'mainpage.html';
+                        };
+                    }, 3000);
+                } else {
+                    // Show error message from the backend
+                    alert(data.message);  // Show the error message received from the server
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('There was an error submitting the request.');
+            }
+        });
+
+        // Close the modal when the user clicks the "x"
+        closeModal.addEventListener('click', function() {
+            successModal.style.display = 'none';
+        });
+
+        // Close the modal if the user clicks outside of the modal content
+        window.addEventListener('click', function(event) {
+            if (event.target === successModal) {
+                successModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
