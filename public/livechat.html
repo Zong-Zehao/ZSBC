@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title></title>
+        <title>Live Chat</title>
         <link rel="stylesheet" type="text/css" href="/styles/livechat.css">
     </head>
     <body>
@@ -27,12 +27,15 @@
                 <div class="messages">
                 </div>
                 <div class="typebox">
-                    <input type="text" id="message-input">
+                    <input type="text" id="message-input" placeholder="Type a message">
+                    <div class="file-upload">
+                        <input type="file" id="file-input" accept="image/*, .pdf, .doc, .docx">
+                        <label for="file-input">Choose File</label>
+                    </div>
                     <button id="send-message">Send</button>
                 </div>
             </div>
         </div>
-
 
         <script type="text/javascript" src="socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/scripts/livechat.js"></script>

@@ -6,7 +6,8 @@ const app = express();
 const port = 3000;
 const path = require("path");
 const server = require("http").createServer(app);
-
+const axios = require('axios'); // Make sure to require axios for HTTP requests
+const multer = require('multer');
 const io = require("socket.io")(server);
 
 const userController = require("./controllers/userController");
@@ -15,9 +16,36 @@ const { getThreads, getThreadById } = require('./controllers/shownewthreadcontro
 const isAdmin = require("./controllers/authMiddleware");
 const { getRepliesByThreadId, addReply, deleteReply, likeReply, likeThread, dislikeThread} = require("./controllers/replyController");
 const LeaderboardController = require('./controllers/leaderboardcontroller');
-
+const queueController = require("./controllers/queuecontroller"); // Import the queue controller
+const waitingRoomController = require("./controllers/waitingroomcontroller");
+const allChatRequestController = require('./controllers/allchatrequestcontroller');
 
 const staticMiddleware = express.static("public");
+
+// Set up storage for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/');  // Store files in the 'public/uploads/' folder
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));  // Use current timestamp as filename
+    }
+});
+
+const upload = multer({ storage: storage });
+app.use(express.static('public'));  // Ensure public directory is accessible
+
+// Route for uploading files
+app.post('/upload', upload.single('file'), (req, res) => {
+    if (req.file) {
+        res.status(200).json({
+            message: 'File uploaded successfully!',
+            fileUrl: `/uploads/${req.file.filename}` // Return the file URL
+        });
+    } else {
+        res.status(400).json({ message: 'No file uploaded.' });
+    }
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,19 +53,58 @@ app.use(staticMiddleware);
 app.use(express.json());
 app.use(express.static(path.join(__dirname+"/public")));
 
-io.on("connection", function(socket){
+activeUsers = 0
+
+io.on("connection", function (socket) {
+    console.log("A user connected");
+
+    // When a new user tries to join
     socket.on("newuser", function(username){
-        socket.broadcast.emit("update", username + " joined the conversation");
+        if (activeUsers >= 2) {
+            socket.emit("chatfull");  // Notify the user that the chat is full
+        } else {
+            activeUsers++;
+            socket.broadcast.emit("update", username + " joined the conversation");
+        }
     });
-    socket.on("exituser", function(username){
+
+    // Handle incoming chat messages
+    socket.on("chat", function (message) {
+        socket.broadcast.emit("chat", message); // Broadcast the message to other users
+    });
+
+    // When a user exits the chat
+    socket.on("exituser", function (username) {
+        activeUsers--;  // Decrease the active user count
+
+        // Make an HTTP request to delete the user's chat request
+        axios.delete(`http://localhost:3000/waitingroom/delete_chat_request?username=${username}`)
+            .then(response => {
+                console.log(`Chat request for user ${username} deleted successfully.`);
+            })
+            .catch(error => {
+                console.error(`Error deleting chat request for user ${username}:`, error);
+            });
+
         socket.broadcast.emit("update", username + " left the conversation");
     });
-    socket.on("chat", function(message){
-        socket.broadcast.emit("chat", message);
+
+    // Handle user disconnection
+    socket.on("disconnect", function () {
+        activeUsers--;  // Decrease the active user count
+        console.log("A user disconnected");
     });
 });
 
+// Add this line to use the waiting room controller
+app.use('/waitingroom', waitingRoomController);
 
+// Add the route for fetching all chat requests
+app.get('/admin/chatrequests', allChatRequestController.fetchAllChatRequests);
+app.put('/admin/chatrequests/:id/accept', allChatRequestController.acceptChatRequest);
+
+// handle chat request form submissions
+app.post("/submit_chat_request", queueController.submitChatRequest);
 
 // User login route
 app.post("/users/login", userController.login);
