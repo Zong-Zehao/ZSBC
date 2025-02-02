@@ -220,6 +220,29 @@ app.delete('/admin/replies/:reply_id', isAdmin, async (req, res) => {
 });
 
 app.post("/users/signup", signupController.signup);
+app.get("/users/:username", userController.getUserDetails);
+
+app.get("/users/:username/threads", async (req, res) => {
+    const { username } = req.params;
+    try {
+        const pool = await sql.connect(dbConfig);
+        const result = await pool.request()
+            .input("username", sql.VarChar, username)
+            .query(`
+                SELECT thread_id, title, category, content, date
+                FROM Threads 
+                WHERE username = @username
+                ORDER BY date DESC
+            `);
+
+        res.status(200).json(result.recordset);
+    } catch (error) {
+        console.error("Error fetching user threads:", error);
+        res.status(500).json({ message: "Error retrieving user threads" });
+    }
+});
+
+
 
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
