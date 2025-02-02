@@ -93,7 +93,10 @@ function renderPost() {
         postContainer.innerHTML = `
             <div class="post">
                 <span class="category-label">${post.category}</span>
-                <h3>${post.author} <span class="reputation">(${reputation} rep)</span></h3>
+                <h3>
+                    <a href="user.html?username=${encodeURIComponent(post.author)}" class="user-link">${post.author}</a> 
+                    <span class="reputation">(${reputation} rep)</span>
+                </h3>
                 <h2>${post.title}</h2>
                 <p>${post.content}</p>
                 <small>${post.date}</small>
@@ -114,7 +117,7 @@ function renderPost() {
                                <div class="menu-options" style="display:none;">
                                    <button onclick="deleteThread()">Delete Thread</button>
                                </div>
-                           </div>`
+                           </div>` 
                         : ""
                 }
             </div>
@@ -193,9 +196,9 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
     container.innerHTML = "";
 
     const filteredReplies = replies.filter(reply => reply.parent_reply_id === parentId);
-    const username = localStorage.getItem("username"); // Current logged-in user's username
-    const role = localStorage.getItem("role"); // Current logged-in user's role
-    const isAdmin = role === "admin"; // Check if the user is an admin
+    const username = localStorage.getItem("username");
+    const role = localStorage.getItem("role");
+    const isAdmin = role === "admin";
 
     filteredReplies.forEach(reply => {
         loadUserReputation(reply.author).then(reputation => {
@@ -203,7 +206,10 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             replyElement.id = `reply-${reply.reply_id}`;
             replyElement.classList.add(parentId ? "nested-reply" : "reply");
             replyElement.innerHTML = `
-                <h4>${reply.author} <span class="reputation">(${reputation} rep)</span></h4>
+                <h4>
+                    <a href="user.html?username=${encodeURIComponent(reply.author)}" class="user-link">${reply.author}</a> 
+                    <span class="reputation">(${reputation} rep)</span>
+                </h4>
                 <p>${reply.content}</p>
                 <small>${new Date(reply.date).toLocaleDateString()}</small>
                 <div class="interaction">
@@ -217,7 +223,6 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
                     </span>
                     <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
                     ${
-                        // Show the delete button only for the reply author or admins
                         (reply.author === username || isAdmin)
                             ? `<button class="delete-reply-btn" onclick="deleteReply(${reply.reply_id})">Delete</button>`
                             : ""
@@ -229,7 +234,7 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             const nestedContainer = document.createElement("div");
             nestedContainer.classList.add("nested-reply-container");
             replyElement.appendChild(nestedContainer);
-            renderAllReplies(replies, nestedContainer, reply.reply_id); // Recursive rendering for nested replies
+            renderAllReplies(replies, nestedContainer, reply.reply_id);
         });
     });
 }
