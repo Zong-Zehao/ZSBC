@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/signup.css">
+    <title>Sign Up Page</title>
+</head>
+<body>
+    <header class="header">
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
+        <p>Support forum</p>
+    </header>
+
+    <nav class="navbar">
+        <p>Banking for individuals</p>
+        <p>Banking for businesses</p>
+        <p>OCBC Group</p>
+    </nav>
+
+    <div class="center-wrapper">
+        <div class="signup-container">
+            <form id="signUpForm">
+                <h2>Sign Up</h2>
+
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter a username" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+                <input type="submit" value="Sign Up">
+                <div id="error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("signUpForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch("/users/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem("username", username);
+                
+                // Show success message as a popup
+                alert("User created successfully!");
+
+                // Redirect to login.html
+                window.location.href = data.redirect; 
+            } else {
+                const error = document.getElementById("error");
+                error.textContent = "Failed to create account. Please try again.";
+            }
+        });
+    </script>
+</body>
+</html>

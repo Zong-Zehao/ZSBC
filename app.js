@@ -19,6 +19,7 @@ const LeaderboardController = require('./controllers/leaderboardcontroller');
 const queueController = require("./controllers/queuecontroller"); // Import the queue controller
 const waitingRoomController = require("./controllers/waitingroomcontroller");
 const allChatRequestController = require('./controllers/allchatrequestcontroller');
+const signupController = require("./controllers/signupController");
 
 const staticMiddleware = express.static("public");
 
@@ -217,6 +218,8 @@ app.delete('/admin/replies/:reply_id', isAdmin, async (req, res) => {
         res.status(500).json({ message: "Failed to start transaction." });
     }
 });
+
+app.post("/users/signup", signupController.signup);
 
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
