@@ -75,6 +75,11 @@ function loadThreadDetailsAndReplies() {
         document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
     });
 }
+// Function to track visited categories and update recommended threads
+function trackVisitedCategory(category) {
+    visitedCategories.add(category); // Store visited categories
+    updateRecommendedThreads();
+}
 
 // Render the main post
 function renderPost() {
