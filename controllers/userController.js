@@ -57,5 +57,25 @@ async function getUserReputation(req, res) {
   }
 }
 
-module.exports = { login, getUserReputation};
+async function getUserDetails(req, res) {
+  const { username } = req.params;
+
+  try {
+    const user = await User.retrieveUser(username); // Fetch user details
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ 
+      username: user.username, 
+      role: user.role, 
+      reputation: user.reputation 
+    });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({ message: "Failed to retrieve user details" });
+  }
+}
+
+module.exports = { login, getUserReputation, getUserDetails};
 

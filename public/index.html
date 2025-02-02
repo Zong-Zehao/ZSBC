@@ -2,73 +2,77 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles/index.css">
-    <title>Login Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./styles/index.css">
+  <title>Login Page</title>
 </head>
 
 <body>
-    <header class="header">
-        <a href="mainpage.html">
-            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
-        </a>
-        <p>Support forum</p>
-    </header>
+  <header class="header">
+    <a href="mainpage.html">
+      <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+    </a>
+    <p>Support forum</p>
+  </header>
 
-    <nav class="navbar">
-        <p>Banking for individuals</p>
-        <p>Banking for businesses</p>
-        <p>OCBC Group</p>
-    </nav>
+  <nav class="navbar">
+    <p>Banking for individuals</p>
+    <p>Banking for businesses</p>
+    <p>OCBC Group</p>
+  </nav>
 
-    <div class="center-wrapper">
-        <div class="login-container">
-            <form id="loginForm">
-                <h2>Login</h2> 
+  <div class="center-wrapper">
+    <div class="login-container">
+      <form id="loginForm">
+        <h2>Login</h2> 
 
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder= "Type your username" required>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Type your username" required>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder= "Type your password" required>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Type your password" required>
 
-                <input type="submit" value="Login">
-                <div id="error" class="error-message"></div>
-            </form>
-        </div>
+        <input type="submit" value="Login">
+        <div id="error" class="error-message"></div>
+      </form>
+      
+      <!-- Link to the signup page -->
+      <p style="text-align:center; margin-top: 1em;">
+        Don't have an account? <a href="signup.html">Sign up here</a>
+      </p>
     </div>
+  </div>
 
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async function (event) {
-            event.preventDefault(); // Prevent the default form submission
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function (event) {
+      event.preventDefault(); // Prevent the default form submission
 
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
 
-            const response = await fetch("/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username,
-                    password
-                })
-            });
+      const response = await fetch("/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      });
 
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("username", username);
-                window.location.href = data.redirect; // Redirect to mainpage.html on success
-            } else {
-                const error = document.getElementById("error");
-                error.textContent = "Invalid username or password";
-            }
-        });
-    </script>
-
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", username);
+        window.location.href = data.redirect; // Redirect to mainpage.html on success
+      } else {
+        const error = document.getElementById("error");
+        error.textContent = "Invalid username or password";
+      }
+    });
+  </script>
 </body>
 
 </html>

@@ -1,0 +1,49 @@
+/* styles/user.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eeeeee;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .header, .navbar {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .center-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .user-container {
+    background-color: white;
+    padding: 2em;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .user-details p {
+    font-size: 1.1em;
+    margin: 0.5em 0;
+  }
+  
+  .threads-list .thread {
+    border-bottom: 1px solid #ddd;
+    padding: 1em 0;
+  }
+  
+  .threads-list .thread h4 {
+    margin: 0;
+  }
+  
+  .threads-list .thread p {
+    font-size: 0.9em;
+    color: #555;
+  }
+  
