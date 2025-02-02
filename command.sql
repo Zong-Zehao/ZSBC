@@ -83,3 +83,16 @@ CREATE TABLE ReplyReactions (
 
 -- Ensure each user can only have one reaction per reply
 CREATE UNIQUE INDEX idx_user_reply_reaction ON ReplyReactions (reply_id, username);
+
+
+-- Create the table to store chat request details
+CREATE TABLE chat_requests (
+    id INT IDENTITY(1,1) PRIMARY KEY,  -- Auto-incrementing ID
+    username VARCHAR(255) NOT NULL,
+    chat_reason VARCHAR(255) NOT NULL,
+    other_details TEXT NULL,            -- NULL for optional field
+    additional_details TEXT NOT NULL,
+    queue_number INT NOT NULL,          -- Store the 6-digit queue number
+    created_at DATETIME DEFAULT GETDATE(),  -- Timestamp for when the request was created
+    status VARCHAR(50) NOT NULL DEFAULT 'not accepted' -- status for chat request (not accepted means admin haven't accept the request yet, accepted means admin accepted the request)
+);

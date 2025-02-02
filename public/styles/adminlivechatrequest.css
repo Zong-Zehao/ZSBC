@@ -1,0 +1,191 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f4f4f4; /* Light background */
+    color: #333; /* Text color */
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: white;
+    border-left: 8px solid #e11a27;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header img {
+    width: 10em;
+}
+
+.header a {
+    text-decoration: none;
+    color: #333;
+}
+
+.header p {
+    font-weight: bold;
+    font-size: 1.2em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin: 0;
+}
+
+/* Page Title */
+h2 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 24px;
+    color: #444;
+}
+
+/* Table Styles */
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table Header */
+thead {
+    background-color: #e11a27;
+    color: white;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Ensure table cells don't expand */
+td {
+    max-width: 200px;  /* Adjust width as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+th {
+    font-weight: bold;
+}
+
+/* Alternate Row Colors */
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hover Effect */
+tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: 0.3s ease-in-out;
+}
+
+/* Modal Styles start */
+/* Modal Styles start */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+    padding-top: 60px;
+    transition: opacity 0.3s ease; /* Smooth fade-in/out effect */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 8px; /* Rounded corners */
+    width: 80%;
+    max-width: 600px; /* Slightly larger width for a more professional feel */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+    font-family: 'Helvetica Neue', sans-serif; /* Modern font */
+    line-height: 1.6; /* Better line spacing */
+}
+
+/* Styling for the modal close button */
+.close-btn {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    float: right;
+    cursor: pointer;
+    transition: color 0.3s ease; /* Smooth color change on hover */
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+/* Modal text styling for better readability */
+.modal-content p {
+    margin: 10px 0;
+    word-wrap: break-word; /* Ensures text breaks and wraps */
+    font-size: 1rem; /* Standard font size */
+    color: #444; /* Darker text for better readability */
+}
+
+/* Styling the action buttons */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Styling for the modal content headings */
+.modal-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e11a27; /* Accent color */
+    margin-bottom: 20px;
+}
+/* Modal Styles end */
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    table {
+        width: 100%;
+    }
+
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header p {
+        margin-top: 10px;
+    }
+}
+
+

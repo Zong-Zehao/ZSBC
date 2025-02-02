@@ -1,0 +1,384 @@
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: #2f363e;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: white;
+    border-left: 8px solid #e11a27;
+    height: 60px;
+}
+
+.header img{
+    width: 10em;
+}
+
+.header p{
+    margin-right: 2em;
+    font-weight:bold;
+    font-size: 1.2em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* Styles for the box below the header */
+.navbar {
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow at the bottom */
+    text-align: center;
+    height: 15px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-around;
+    background: #fff;
+}
+
+.navbar p {
+    margin-right:40px;
+}
+
+.queue-title,
+.queuecount {
+    text-align: center;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 100px; /* Reduce the gap by adjusting this value */
+}
+
+.queuecount {
+    margin-top: 20px; /* Reduce the gap here to get closer to the previous section */
+}
+
+/* chat request details start */
+.chat-request-details {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    margin: 50px auto;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+}
+
+.chat-request-details h3 {
+    font-size: 1.8em;
+    color: #e11a27;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.chat-request-details p {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.chat-request-details strong {
+    font-weight: bold;
+}
+
+.chat-request-details span {
+    font-weight: normal;
+    color: #555;
+}
+/* chat request details end */
+
+/* delete button start */
+.delete-btn {
+    background-color: #ff4d4d; /* Professional red tone */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin: 20px auto; /* Centers the button */
+    width: fit-content;
+}
+
+.delete-btn:hover {
+    background-color: #cc0000; /* Darker red for hover */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05); /* Slight zoom effect */
+}
+
+.delete-btn:active {
+    background-color: #a80000;
+    transform: scale(0.98);
+}
+/* delete button start */
+
+
+/* clock start */
+#clock {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    margin-top: 100px;
+}
+
+#secDots,
+#minDots,
+#hrDots
+{
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    rotate: 90deg;
+}
+
+#secDots::before,
+#minDots::before,
+#hrDots::before
+{
+    content: '';
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    box-shadow: 25px 25px 75px rgba(0,0,0,0.25),
+    10px 10px 70px rgba(0,0,0,0.25),
+    inset 5px 5px 10px rgba(0,0,0,0.5),
+    inset 5px 5px 20px rgba(225,225,225,0.2),
+    inset -5px -5px 15px rgba(0,0,0,0.75);
+}
+
+#secDots h2,
+#minDots h2,
+#hrDots h2
+{
+    position: absolute;
+    text-align: center;
+    transform: rotate(-90deg);
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 4em;
+    font-weight: 500;
+    color: var(--clr);
+}
+
+#secDots h2 span,
+#minDots h2 span,
+#hrDots h2 span
+{
+    position: absolute;
+    font-size: 0.25em;
+    font-weight: 500;
+    bottom: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+#secDots b
+{
+    position: absolute;
+    color: #fff;
+    display: inline-flex;
+    transform: rotate(-90deg) translate(-30px,90px)
+}
+
+#secDots .dot,
+#minDots .dot,
+#hrDots .dot
+{
+    position: absolute;
+    top: 50%;
+    width: 10px;
+    height: 3px;
+    background: var(--clr);
+    transform-origin: 100px;
+}
+
+#secDots .active.dot,
+#minDots .active.dot,
+#hrDots .active.dot
+{
+    background: var(--clr);
+    box-shadow: 0 0 10px var(--clr),
+    0 0 20px var(--clr),
+    0 0 30px var(--clr);
+}
+
+#secDots .active.dot ~ .dot,
+#minDots .active.dot ~ .dot,
+#hrDots .active.dot ~ .dot
+{
+    background: #555;
+}
+
+#secDots .dot:nth-child(5n + 5),
+#minDots .dot:nth-child(5n + 5)
+{
+    width: 20px;
+
+}
+
+#hrDots .dot
+{
+    width: 20px;
+
+}
+
+#hrDots .dot::before
+{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 4px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--clr);
+    box-shadow: 1.5px 9px var(--clr),
+    4px 18px var(--clr),
+    7px 27px var(--clr);
+}
+
+#hrDots .dot.active ~.dot::before
+{
+    background: #555;
+    box-shadow: 1.5px 9px #555,
+    4px 18px #555,
+    7px 27px #555;
+
+}
+
+/* clock end */
+
+/* live chat start */
+/* Live Chat Invitation Popup */
+.live-chat-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.popup-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+}
+
+.live-chat-popup.show {
+    display: flex;
+    animation: popupFadeIn 0.3s forwards;
+}
+
+.popup-content h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.popup-content p {
+    font-size: 1.2em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+button {
+    font-size: 1.1em;
+    padding: 12px 25px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+    border: none;
+    font-weight: 600;
+    width: 150px;
+}
+
+/* Join Live Chat Button */
+#joinLiveChatBtn {
+    background-color: #4CAF50; /* Green for action */
+    color: white;
+}
+
+#joinLiveChatBtn:hover {
+    background-color: #45a049;
+}
+
+#joinLiveChatBtn:active {
+    background-color: #3e8e41;
+}
+
+/* Close Button */
+#closePopupBtn {
+    background-color: #f44336; /* Red for cancel */
+    color: white;
+}
+
+#closePopupBtn:hover {
+    background-color: #e53935;
+}
+
+#closePopupBtn:active {
+    background-color: #d32f2f;
+}
+
+/* Animations for the popup */
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Optional: Background dimming effect */
+.live-chat-popup.show::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+/* live chat start */
