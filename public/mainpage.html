@@ -24,10 +24,18 @@
 
     <div class="image">
         <div class="text">
-            <p>Empowering you with knowledge and<br>support, because at OCBC, we believe<br> in helping you navigate
-                your financial <br>journey with confidence.</p>
-            <button class="scroll" onclick="document.getElementById('assist').scrollIntoView({ behavior: 'smooth' });">
-                Learn more</button>
+            <p>
+                Empowering you with knowledge and<br>support, because at OCBC, we believe<br> in helping you navigate
+                your financial <br>journey with confidence.
+            </p>
+            <div class="scroll-container">
+                <button class="scroll" onclick="document.getElementById('assist').scrollIntoView({ behavior: 'smooth' });">
+                    Learn more
+                </button>
+                <button class="scroll" onclick="window.location.href='livechat.html';">
+                    Consult a Professional
+                </button>
+            </div>
         </div>
         <img
             src="https://www.ocbc.com/iwov-resources/sg/ocbc/careers/img/blogs/toppingthechartsatocbc/Jensen_Yeoh_team_photo.jpg"></img>
@@ -42,6 +50,16 @@
             <input type="text" placeholder="Search Threads" class="search-input" id="searchInput">
         </div>
 
+        <!-- leaderboard start -->
+        <div class="leaderboard-container">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboard">
+                <!-- Leaderboard items will be dynamically added here -->
+            </ul>
+        </div>
+        <!-- leaderboard end -->
+
+
         <div class=a>
             <p>Not finding what you're looking for? Create a thread!</p>
         </div>
@@ -51,7 +69,7 @@
         </div>
 
         <div class="replies-container">
-            <span class="replies-text">Threads</span>
+            <span class="replies-text">Hot Threads</span>
 
             <!-- Category filter dropdown -->
 
@@ -93,9 +111,16 @@
         </div>
     </section>
     <!-- Show all threads end -->
-
+    <section id="recommendedThreadsSection">
+        <h2>Recommended for You</h2>
+        <div id="recommendedThreadsContainer" class="threads-container">
+            <!-- Recommended threads will be dynamically added here -->
+        </div>
+    </section>
+    
     <script>
-        let currentSort = 'Best'; // Default sort type
+        let visitedCategories = new Set();
+        let currentSort = 'Best';
 
         function updateDropdown(selection) {
             document.getElementById('dropdownBtn').innerHTML = selection + ' ▼';
@@ -105,19 +130,15 @@
 
         function loadThreads() {
             fetch('/threads', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    window.allThreads = data; // Store all threads globally for filtering and sorting
-                    sortAndDisplayThreads(); // Display threads initially
-                })
-                .catch(error => {
-                    console.error('Error fetching threads:', error);
-                });
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.allThreads = data;
+                sortAndDisplayThreads();
+            })
+            .catch(error => console.error('Error fetching threads:', error));
         }
 
         function sortAndDisplayThreads() {
@@ -125,8 +146,7 @@
 
             if (currentSort === 'Newest') {
                 sortedThreads.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (currentSort === 'Best') {
-                // Sort by total_likes in descending order
+            } else {
                 sortedThreads.sort((a, b) => b.total_likes - a.total_likes);
             }
 
@@ -138,8 +158,7 @@
             const selectedCategory = document.getElementById("categoryFilter").value;
             const filteredThreads = window.allThreads.filter(thread => {
                 const matchesCategory = selectedCategory ? thread.category === selectedCategory : true;
-                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase()
-                    .includes(query);
+                const matchesSearch = thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query);
                 return matchesCategory && matchesSearch;
             });
             displayThreads(filteredThreads);
@@ -155,35 +174,84 @@
             threads.forEach(thread => {
                 const threadElement = document.createElement("div");
                 threadElement.className = "thread";
-
                 threadElement.onclick = () => {
+                    trackVisitedCategory(thread.category);
                     window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
                 };
-
                 threadElement.innerHTML = `
+                    <h3>${thread.title}</h3>
+                    <p class="thread-category">${thread.category}</p>
+                    <p>${thread.content}</p>
+                    <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
+                `;
+                threadsContainer.appendChild(threadElement);
+            });
+        }
+        function updateRecommendedThreads() {
+    const recommendedThreadsContainer = document.getElementById("recommendedThreadsContainer");
+    recommendedThreadsContainer.innerHTML = '';
+
+    if (visitedCategories.size === 0) {
+        recommendedThreadsContainer.innerHTML = '<p>No recommendations yet. Visit threads to see suggestions.</p>';
+        return;
+    }
+
+    const recommendedThreads = window.allThreads.filter(thread => visitedCategories.has(thread.category));
+    if (recommendedThreads.length === 0) {
+        recommendedThreadsContainer.innerHTML = '<p>No recommended threads found.</p>';
+        return;
+    }
+
+    recommendedThreads.forEach(thread => {
+        const threadElement = document.createElement("div");
+        threadElement.className = "recommended-thread"; // Updated class
+        threadElement.onclick = () => window.location.href = `viewThread.html?thread_id=${thread.thread_id}`;
+        threadElement.innerHTML = `
             <h3>${thread.title}</h3>
             <p class="thread-category">${thread.category}</p>
             <p>${thread.content}</p>
             <small>Posted by ${thread.username} on ${new Date(thread.date).toLocaleDateString()}</small>
         `;
+        recommendedThreadsContainer.appendChild(threadElement);
+    });
+}
+        function trackVisitedCategory(category) {
+            visitedCategories.add(category);
+            updateRecommendedThreads();
+        }
 
-                threadsContainer.appendChild(threadElement);
+        function loadLeaderboard() {
+            fetch('/leaderboard', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayLeaderboard(data.data);
+                } else {
+                    console.error('Failed to load leaderboard:', data.message);
+                }
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+        }
+
+        function displayLeaderboard(leaderboard) {
+            const leaderboardContainer = document.getElementById('leaderboard');
+            leaderboardContainer.innerHTML = '';
+
+            leaderboard.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${user.username}</strong> Reputation: ${user.reputation}`;
+                leaderboardContainer.appendChild(listItem);
             });
         }
 
-
-        document.getElementById("searchInput").addEventListener("input", function () {
-            const query = this.value.toLowerCase();
-            const filteredThreads = window.allThreads.filter(thread =>
-                thread.title.toLowerCase().includes(query) || thread.content.toLowerCase().includes(query)
-            );
-            displayThreads(filteredThreads);
-        });
-
-        // Load threads when the page loads
-        window.onload = loadThreads;
+        window.onload = function () {
+            loadThreads();
+            loadLeaderboard();
+        };
     </script>
-
 </body>
 
 </html>

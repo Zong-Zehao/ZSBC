@@ -8,7 +8,7 @@ function getThreadIdFromURL() {
 let post = {
     author: "",
     title: "",
-    category:"",
+    category: "",
     content: "",
     date: "",
     likes: 0,
@@ -21,7 +21,7 @@ let post = {
 let hasLikedPost = false;
 let hasDislikedPost = false;
 
-//load user reputation
+// Load user reputation
 function loadUserReputation(username) {
     return fetch(`/users/${username}/reputation`)
         .then(response => response.json())
@@ -74,6 +74,11 @@ function loadThreadDetailsAndReplies() {
         console.error("Error loading thread or replies:", error);
         document.getElementById("post-container").innerHTML = "<p>Error loading thread.</p>";
     });
+}
+// Function to track visited categories and update recommended threads
+function trackVisitedCategory(category) {
+    visitedCategories.add(category); // Store visited categories
+    updateRecommendedThreads();
 }
 
 // Render the main post
@@ -188,6 +193,9 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
     container.innerHTML = "";
 
     const filteredReplies = replies.filter(reply => reply.parent_reply_id === parentId);
+    const username = localStorage.getItem("username"); // Current logged-in user's username
+    const role = localStorage.getItem("role"); // Current logged-in user's role
+    const isAdmin = role === "admin"; // Check if the user is an admin
 
     filteredReplies.forEach(reply => {
         loadUserReputation(reply.author).then(reputation => {
@@ -208,6 +216,12 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
                         <span class="dislike-count">${reply.dislikes || 0}</span>
                     </span>
                     <button class="reply-btn" onclick="addReplyToReply(${reply.reply_id}, this)">Reply</button>
+                    ${
+                        // Show the delete button only for the reply author or admins
+                        (reply.author === username || isAdmin)
+                            ? `<button class="delete-reply-btn" onclick="deleteReply(${reply.reply_id})">Delete</button>`
+                            : ""
+                    }
                 </div>
             `;
             container.appendChild(replyElement);
@@ -215,10 +229,10 @@ function renderAllReplies(replies, container = document.getElementById("reply-co
             const nestedContainer = document.createElement("div");
             nestedContainer.classList.add("nested-reply-container");
             replyElement.appendChild(nestedContainer);
-            renderAllReplies(replies, nestedContainer, reply.reply_id);
+            renderAllReplies(replies, nestedContainer, reply.reply_id); // Recursive rendering for nested replies
         });
     });
-}   
+}
 
 // Function to toggle the visibility of the menu 
 function toggleMenu(button) { 
@@ -254,10 +268,11 @@ function deleteThread() {
         });
     }
 }
+
 // Function to delete a reply 
 function deleteReply(reply_id) { 
     const username = localStorage.getItem("username"); 
- 
+
     if (confirm("Are you sure you want to delete this reply?")) { 
         fetch(`/replies/${reply_id}`, { 
             method: 'DELETE', 
@@ -269,19 +284,20 @@ function deleteReply(reply_id) {
             .catch(error => console.error("Error deleting reply:", error)); 
     } 
 } 
+
 // Function to add a reply to the main post 
 function addReplyToPost() { 
     const replyContent = prompt("Enter your reply:"); 
     if (!replyContent) return; 
- 
+
     const thread_id = getThreadIdFromURL(); 
     if (!thread_id) { 
         console.error("Thread ID is missing"); 
         return; 
     } 
- 
+
     const author = localStorage.getItem("username") || "Guest"; 
- 
+
     fetch(`/threads/${thread_id}/replies`, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
@@ -291,20 +307,20 @@ function addReplyToPost() {
     .then(() => loadThreadDetailsAndReplies()) 
     .catch(error => console.error('Error adding reply:', error)); 
 } 
- 
+
 // Function to add a reply to a reply 
 function addReplyToReply(parent_reply_id, parentReplyElement) { 
     const replyContent = prompt("Enter your reply:"); 
     if (!replyContent) return; 
- 
+
     const thread_id = getThreadIdFromURL(); 
     if (!thread_id) { 
         console.error("Thread ID is missing"); 
         return; 
     } 
- 
+
     const author = localStorage.getItem("username") || "Guest"; 
- 
+
     fetch(`/threads/${thread_id}/replies`, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
@@ -314,5 +330,6 @@ function addReplyToReply(parent_reply_id, parentReplyElement) {
     .then(() => loadThreadDetailsAndReplies()) 
     .catch(error => console.error('Error adding nested reply:', error)); 
 } 
+
 // Load the thread details and replies when the page loads
 window.onload = loadThreadDetailsAndReplies;

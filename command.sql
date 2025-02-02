@@ -68,7 +68,6 @@ ADD parent_reply_id INT NULL;
 ALTER TABLE Replies
 ADD CONSTRAINT FK_Replies_ParentReply
 FOREIGN KEY (parent_reply_id) REFERENCES Replies(reply_id);
-ALTER TABLE Replies ADD likes INT DEFAULT 0, dislikes INT DEFAULT 0;
 
 -- Create ReplyReactions table to track likes and dislikes for each user on each reply
 CREATE TABLE ReplyReactions (

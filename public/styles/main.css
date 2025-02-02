@@ -63,8 +63,10 @@ body {
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
-.text{
+.text {
+    display: flex;
     flex-direction: column;
+    align-items: flex-start; /* Aligns buttons and text to the left */
 }
 
 .scroll{
@@ -79,6 +81,12 @@ body {
     font-weight: bold;
     font-size: 20px;
     cursor: pointer; /* Changes the mouse pointer to a click hand icon */
+}
+
+.scroll-container {
+    display: flex;
+    gap: 1em; /* Add consistent spacing between buttons */
+    margin-top: 20px;
 }
 
 .scroll:hover {
@@ -142,6 +150,81 @@ article{
     opacity: 0.8;
     margin:0
 }
+
+/* leaderboard start */
+/* leaderboard container */
+.leaderboard-container {
+    position: absolute;
+    top: 680px; /* Adjust based on your layout */
+    right: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    max-width: 320px;
+    width: 100%;
+}
+
+/* leaderboard title */
+.leaderboard-container h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* leaderboard list */
+#leaderboard {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+/* leaderboard list items */
+#leaderboard li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 12px 0;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+/* leaderboard user name */
+#leaderboard li strong {
+    font-size: 16px;
+    color: #333;
+}
+
+/* leaderboard user reputation */
+#leaderboard li span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d00000;
+}
+
+/* hover effect on leaderboard items */
+#leaderboard li:hover {
+    background-color: #e6f7ff;
+    cursor: pointer;
+}
+
+/* make the reputation standout */
+#leaderboard li span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d00000; /* Red for high visibility */
+    background-color: #fff3f3;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+/* leaderboard end */
+
 
 /*reply button*/
 .reply-container {
@@ -288,6 +371,76 @@ article{
     color: #999;
 }
 
+/* Recommended Threads Section */
+#recommendedThreadsSection {
+    margin-top: 2rem;
+    padding: 2rem;
+}
+
+#recommendedThreadsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+    gap: 80px; /* Space between each thread */
+    justify-items: center; /* Center align items */
+    padding: 1rem;
+    margin-left: 75px;
+}
+
+#recommendedThreadsSection h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 80px;
+    color: #333;
+}
+
+/* Individual recommended thread box */
+.recommended-thread {
+    background-color: #F9F9F9;
+    width: 100%;
+    max-width: 350px;
+    height: 170px;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0px 4px 8px rgba(213, 0, 50, 0.25);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.recommended-thread:hover {
+    transform: translateY(-5px);
+}
+
+.recommended-thread h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0 0 0.5rem;
+}
+
+.recommended-thread p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 0 0.5rem;
+    line-height: 1.4;
+}
+
+.recommended-thread small {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* Category badge for recommended threads */
+.recommended-thread .thread-category {
+    font-size: 0.8rem;
+    color: #000000;
+    background-color: #d6e6ee;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-top: 5px;
+    text-align: center;
+}
 
 .category-filter {
     appearance: none;

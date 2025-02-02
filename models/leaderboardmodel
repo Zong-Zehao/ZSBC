@@ -1,0 +1,23 @@
+const sql = require("mssql");
+const dbConfig = require("../dbConfig");
+
+class LeaderboardModel {
+    // Get all users and their reputations, sorted by reputation in descending order
+    static async getLeaderboard() {
+      try {
+        const pool = await sql.connect(dbConfig); // Connect to the database
+        const result = await pool
+          .request()
+          .query(`
+            SELECT username, reputation
+            FROM Users
+            ORDER BY reputation DESC
+          `);
+        return result.recordset; // Return an array of users and reputations
+      } catch (err) {
+        throw new Error("Error fetching leaderboard: " + err.message);
+      }
+    }
+  }
+  
+  module.exports = LeaderboardModel;
