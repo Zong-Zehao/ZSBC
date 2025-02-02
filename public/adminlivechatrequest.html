@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/adminlivechatrequest.css"> <!-- Optional CSS for styling -->
+</head>
+<body>
+    <header class="header">
+        <a href="mainpage.html">
+            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC Bank Logo">
+        </a>
+        <a href="admin.html">
+            <p>Admin Panel</p>
+        </a>
+    </header>
+
+    <h2>Live Chat Requests</h2>
+
+    <!-- Chat Requests Table -->
+    <table id="chatRequestsTable">
+        <thead>
+            <tr>
+                <th>Queue No</th>
+                <th>Username</th>
+                <th>Chat Reason</th>
+                <th>Other Details</th>
+                <th>Additional Details</th>
+                <th>Created At</th>
+                <th>Status</th> <!-- Added Status Column -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Chat requests will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Modal for Chat Request Details -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Chat Request Details</h3>
+            <p><strong>Queue No:</strong> <span id="modalQueueNumber"></span></p>
+            <p><strong>Username:</strong> <span id="modalUsername"></span></p>
+            <p><strong>Chat Reason:</strong> <span id="modalChatReason"></span></p>
+            <p><strong>Other Details:</strong> <span id="modalOtherDetails"></span></p>
+            <p><strong>Additional Details:</strong> <span id="modalAdditionalDetails"></span></p>
+            <p><strong>Created At:</strong> <span id="modalCreatedAt"></span></p>
+            <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+            <button id="acceptBtn">Accept</button>
+            <button class="close-btn">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function truncateText(text, wordLimit) {
+            if (!text || text.trim() === "") return "N/A"; // Handle empty values
+            const words = text.trim().split(/\s+/); // Split by any whitespace
+            if (words.length > wordLimit) {
+                return words.slice(0, wordLimit).join(" ") + "..."; // Truncate and add ellipsis
+            }
+            return text;
+        }
+
+        async function fetchChatRequests() {
+            try {
+                const response = await fetch("/admin/chatrequests");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch chat requests");
+                }
+            
+                const chatRequests = await response.json();
+                const tableBody = document.querySelector("#chatRequestsTable tbody");
+            
+                tableBody.innerHTML = ""; // Clear previous data
+            
+                chatRequests.forEach(request => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${request.queue_number}</td>
+                        <td>${request.username}</td>
+                        <td>${request.chat_reason}</td>
+                        <td title="${request.other_details || 'N/A'}">${truncateText(request.other_details, 10)}</td>
+                        <td title="${request.additional_details}">${truncateText(request.additional_details, 10)}</td>
+                        <td>${new Date(request.created_at).toLocaleString()}</td>
+                        <td class="status ${request.status}">${request.status}</td>
+                    `;
+                    row.addEventListener("click", () => showModal(request)); // Attach click event
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error loading chat requests:", error);
+            }
+        }
+
+        function showModal(request) {
+            const modal = document.getElementById("chatModal");
+            document.getElementById("modalQueueNumber").innerText = request.queue_number;
+            document.getElementById("modalUsername").innerText = request.username;
+            document.getElementById("modalChatReason").innerText = request.chat_reason;
+            document.getElementById("modalOtherDetails").innerText = request.other_details || "N/A";
+            document.getElementById("modalAdditionalDetails").innerText = request.additional_details;
+            document.getElementById("modalCreatedAt").innerText = new Date(request.created_at).toLocaleString();
+            document.getElementById("modalStatus").innerText = request.status;
+                
+            // Show the modal
+            modal.style.display = "block";
+                
+            // Accept button functionality
+            document.getElementById("acceptBtn").onclick = async () => {
+                try {
+                    const response = await fetch(`/admin/chatrequests/${request.id}/accept`, { method: "PUT" });
+                    if (response.ok) {
+                        alert("Chat request accepted");
+                    
+                        // Open livechat.html in a new tab
+                        window.open("livechat.html", "_blank");
+                    
+                        // Refresh the table and close the modal
+                        fetchChatRequests();
+                        modal.style.display = "none"; 
+                    } else {
+                        alert("Failed to accept chat request");
+                    }
+                } catch (error) {
+                    console.error("Error accepting chat request:", error);
+                }
+            };
+        }
+
+        window.onload = fetchChatRequests;
+
+        // Close button functionality
+        const closeBtns = document.querySelectorAll(".close-btn");
+        closeBtns.forEach(btn => {
+            btn.onclick = () => {
+                document.getElementById("chatModal").style.display = "none";
+            };
+        });
+
+        // Close the modal if clicked outside of it
+        window.onclick = (event) => {
+            if (event.target === document.getElementById("chatModal")) {
+                document.getElementById("chatModal").style.display = "none";
+            }
+        };
+    </script>
+</body>

@@ -32,8 +32,11 @@
                 <button class="scroll" onclick="document.getElementById('assist').scrollIntoView({ behavior: 'smooth' });">
                     Learn more
                 </button>
-                <button class="scroll" onclick="window.location.href='livechat.html';">
+                <button class="scroll" onclick="window.location.href='queue.html';">
                     Consult a Professional
+                </button>
+                <button class="scroll" onclick="window.location.href='waitingroom.html';">
+                    Waiting Room
                 </button>
             </div>
         </div>
@@ -49,16 +52,6 @@
             </button>
             <input type="text" placeholder="Search Threads" class="search-input" id="searchInput">
         </div>
-
-        <!-- leaderboard start -->
-        <div class="leaderboard-container">
-            <h3>Leaderboard</h3>
-            <ul id="leaderboard">
-                <!-- Leaderboard items will be dynamically added here -->
-            </ul>
-        </div>
-        <!-- leaderboard end -->
-
 
         <div class=a>
             <p>Not finding what you're looking for? Create a thread!</p>
@@ -117,6 +110,16 @@
             <!-- Recommended threads will be dynamically added here -->
         </div>
     </section>
+            <!-- leaderboard start -->
+        <div class="leaderboard-container">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboard">
+                <!-- Leaderboard items will be dynamically added here -->
+            </ul>
+        </div>
+        <!-- leaderboard end -->
+    
+    
     
     <script>
         let visitedCategories = new Set();
