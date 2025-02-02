@@ -10,6 +10,8 @@ const { createThread, deleteThread } = require("./controllers/threadController")
 const { getThreads, getThreadById } = require('./controllers/shownewthreadcontroller');
 const isAdmin = require("./controllers/authMiddleware");
 const { getRepliesByThreadId, addReply, deleteReply, likeReply, likeThread, dislikeThread} = require("./controllers/replyController");
+const LeaderboardController = require('./controllers/leaderboardcontroller');
+const signupController = require("./controllers/signupController");
 
 
 const staticMiddleware = express.static("public");
@@ -105,7 +107,8 @@ app.delete('/admin/replies/:reply_id', isAdmin, async (req, res) => {
     }
 });
 
+app.post("/users/signup", signupController.signup);
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
