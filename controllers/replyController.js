@@ -35,10 +35,11 @@ async function addReply(req, res) {
     const { thread_id, author, content, parent_reply_id } = req.body;
 
     const sensitivePatterns = [
-        /\b\d{8}\b/, // Phone numbers
-        /\b(?:\d{4}-){3}\d{4}|\d{16}\b/, // Credit card numbers
-        /\b\d{4}\b/ // PIN numbers
-    ];
+  /\b(?:\+?(\d{1,3})\s?)?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,4}[-.\s]?\d{4}\b/,
+  /\b(?:\d{4}[-\s]?){3}\d{4}|\d{16}\b/,
+  /\b\d{4,6}\b/,
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
+      ];
 
     function containsSensitiveData(content) {
         return sensitivePatterns.some((pattern) => pattern.test(content));
